@@ -33,14 +33,14 @@ export const questions = [
     difficulty: 'easy',
     question: 'Какой язык ты очень хочешь выучить',
     answer: 'Испанский',
-    prize: 'книга Лучшие испанские сказки'
+    prize: 'Книга Лучшие испанские сказки'
   },
   {
     id: 6,
     difficulty: 'easy',
     question: 'Какое место в ленобласти ты постоянно хейтишь',
     answer: 'Мурино',
-    prize: 'табличка Я люблю мурино'
+    prize: 'Табличка "Я люблю мурино"'
   },
   {
     id: 7,
@@ -55,7 +55,7 @@ export const questions = [
     difficulty: 'medium',
     question: 'Под эту песню на концерте ты сказала, что меня очень не хватает рядом',
     answer: 'Цветами радуги',
-    prize: 'pyrokinesis - цветами радуги рамка'
+    prize: 'Рамка pyrokinesis - цветами радуги '
   },
   {
     id: 9,
@@ -69,7 +69,7 @@ export const questions = [
     difficulty: 'medium',
     question: 'Что я прочитал по твоему настоянию',
     answer: 'Норвежский лес',
-    prize: 'книга Норвежский лес'
+    prize: 'Книга Норвежский лес'
   },
   {
     id: 11,
@@ -83,21 +83,21 @@ export const questions = [
     difficulty: 'medium',
     question: 'символ богатства, долголетия и удачи, особенно в китайской культуре',
     answer: 'Жаба',
-    prize: 'футболка жаба'
+    prize: 'Футболка жаба'
   },
   {
     id: 13,
     difficulty: 'medium',
     question: 'Заполни красворд',
     answer: 'кросворд',
-    prize: 'кружка лучший методист'
+    prize: 'Кружка "Лучший Методист'
   },
   {
     id: 14,
     difficulty: 'medium',
     question: 'На какой паре я тебя впервые заметил',
     answer: 'Маркетинг',
-    prize: 'подарочный набор'
+    prize: 'Подарочный набор'
   },
   // Тяжелые (15-21)
   {
@@ -105,35 +105,35 @@ export const questions = [
     difficulty: 'hard',
     question: 'Рогатый заяц, обитающий в лесах баварии',
     answer: 'вольпертингер',
-    prize: 'огромная банка с пивом вольпертингер'
+    prize: 'Огромная банка с пивом вольпертингер'
   },
   {
     id: 16,
     difficulty: 'hard',
     question: 'Когда мы впервые кратко поговорили',
     answer: '3 марта',
-    prize: 'микрофон C-1U'
+    prize: 'Микрофон C-1U'
   },
   {
     id: 17,
     difficulty: 'hard',
     question: 'Куда мы пошли в первую нашу прогулку',
     answer: 'Токио Сити',
-    prize: 'Сертификат в токио сити'
+    prize: 'Сертификат в Токио Сити'
   },
   {
     id: 18,
     difficulty: 'hard',
     question: 'С кем тебя сравнил в диссе на тебя',
     answer: 'Меган Мурковски',
-    prize: 'ep birthday'
+    prize: 'EP birthday'
   },
   {
     id: 19,
     difficulty: 'hard',
     question: 'Сколько кустов роз было в том самом букете',
     answer: '13',
-    prize: 'пирожное роза'
+    prize: 'Пирожное роза'
   },
   {
     id: 20,
@@ -147,7 +147,7 @@ export const questions = [
     difficulty: 'hard',
     question: 'Как думаешь, почему ты самая лучшая',
     answer: '*любой ответ верен*',
-    prize: 'портрет ее'
+    prize: 'Твой портрет'
   }
 ]
 

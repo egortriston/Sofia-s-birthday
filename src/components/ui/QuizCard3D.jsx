@@ -1,9 +1,35 @@
 import { useRef, useState } from 'react'
 import { Html, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import cardImage from '../../images/photo_2025-04-19_21-05-17.jpg'
+import image21 from '../../images/2.1.jpg'
+import image22 from '../../images/2.2.jpg'
+import image23 from '../../images/2.3.jpg'
+import image24 from '../../images/2.4.jpg'
+import image25 from '../../images/2.5.jpg'
+import image26 from '../../images/2.6.jpg'
+import image27 from '../../images/2.7.jpg'
+import image28 from '../../images/2.8.jpg'
+import image29 from '../../images/2.9.jpg'
+import image210 from '../../images/2.10.jpg'
+import image211 from '../../images/2.11.jpg'
+import image212 from '../../images/2.12.jpg'
+import image213 from '../../images/2.13.jpg'
+import image214 from '../../images/2.14.jpg'
+import image215 from '../../images/2.15.jpg'
+import image216 from '../../images/2.16.jpg'
+import image217 from '../../images/2.17.jpg'
+import image218 from '../../images/2.18.jpg'
+import image219 from '../../images/2.19.jpg'
+import image220 from '../../images/2.20.jpg'
+import image221 from '../../images/2.21.jpg'
 
 const CARD_IMAGE_SIZE = 1.5
+
+// Массив всех изображений для карточек
+const cardImages = [
+  image21, image22, image23, image24, image25, image26, image27, image28, image29, image210,
+  image211, image212, image213, image214, image215, image216, image217, image218, image219, image220, image221
+]
 
 export function QuizCard3D({ 
   question, 
@@ -17,8 +43,9 @@ export function QuizCard3D({
   const meshRef = useRef()
   const [hovered, setHovered] = useState(false)
   
-  // Используем локальное изображение как временную заставку для всех карточек
-  const texture = useTexture(cardImage)
+  // Выбираем правильное изображение по индексу (imageIndex 0 = 2.1.jpg, imageIndex 1 = 2.2.jpg и т.д.)
+  const selectedImage = cardImages[imageIndex] || cardImages[0]
+  const texture = useTexture(selectedImage)
   
   // Настройка текстуры
   if (texture) {
@@ -31,7 +58,7 @@ export function QuizCard3D({
 
   return (
     <group position={position} rotation={rotation}>
-      {/* Звездообразное свечение СЗАДИ карточки */}
+      {/* Очень яркое свечение СЗАДИ карточки на всю фотку */}
       {!isAnswered && (
         <Html
           transform
@@ -39,9 +66,9 @@ export function QuizCard3D({
           position={[0, 0, -0.03]}
           style={{
             pointerEvents: 'none',
-            width: `${CARD_IMAGE_SIZE * 500}px`,
-            height: `${CARD_IMAGE_SIZE * 500}px`,
-            overflow: 'hidden',
+            width: `${CARD_IMAGE_SIZE * 600}px`,
+            height: `${CARD_IMAGE_SIZE * 600}px`,
+            overflow: 'visible',
           }}
         >
           <div
@@ -54,50 +81,22 @@ export function QuizCard3D({
               justifyContent: 'center',
             }}
           >
-            {/* Размытое звездообразное свечение вокруг карточки */}
+            {/* Легкое размытое свечение цвета карточки по уровню сложности на всю фотку */}
             <div
               style={{
                 position: 'absolute',
-                width: '100%',
-                height: '100%',
-                background: `radial-gradient(circle, transparent 10%, ${color}40 20%, ${color}70 30%, transparent 50%)`,
-                filter: 'blur(30px)',
+                width: '110%',
+                height: '110%',
+                background: `radial-gradient(circle, ${color}AA 0%, ${color}88 7%, ${color}66 20%, ${color}55 30%, ${color}44 45%, ${color}33 60%, ${color}22 80%, transparent 100%)`,
+                filter: 'blur(70px)',
                 borderRadius: '50%',
               }}
             />
-            {/* Лучи звезды, выходящие за пределы карточки */}
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => {
-              const rad = (angle * Math.PI) / 180
-              const centerX = 50
-              const centerY = 50
-              const rayLength = 100
-              const startX = centerX + Math.cos(rad) * 10
-              const startY = centerY + Math.sin(rad) * 10
-              
-              return (
-                <div
-                  key={index}
-                  style={{
-                    position: 'absolute',
-                    left: `${startX}%`,
-                    top: `${startY}%`,
-                    width: '12px',
-                    height: `${rayLength - 10}px`,
-                    background: `linear-gradient(to ${angle < 180 ? 'bottom' : 'top'}, ${color}90, ${color}60, transparent)`,
-                    borderRadius: '6px',
-                    transformOrigin: 'top center',
-                    transform: `rotate(${angle}deg)`,
-                    filter: 'blur(10px)',
-                    opacity: 0.9,
-                  }}
-                />
-              )
-            })}
           </div>
         </Html>
       )}
       
-      {/* Серое звездообразное свечение СЗАДИ для отвеченных карточек */}
+      {/* Легкое серое свечение СЗАДИ для отвеченных карточек */}
       {isAnswered && (
         <Html
           transform
@@ -120,45 +119,17 @@ export function QuizCard3D({
               justifyContent: 'center',
             }}
           >
-            {/* Размытое серое свечение вокруг карточки */}
+            {/* Простое размытое серое свечение */}
             <div
               style={{
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
-                background: 'radial-gradient(circle, transparent 10%, rgba(156, 163, 175, 0.35) 20%, rgba(156, 163, 175, 0.55) 30%, transparent 50%)',
-                filter: 'blur(30px)',
+                background: 'radial-gradient(circle, rgba(156, 163, 175, 0.25) 0%, rgba(156, 163, 175, 0.15) 30%, transparent 60%)',
+                filter: 'blur(40px)',
                 borderRadius: '50%',
               }}
             />
-            {/* Серые лучи звезды */}
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => {
-              const rad = (angle * Math.PI) / 180
-              const centerX = 50
-              const centerY = 50
-              const rayLength = 100
-              const startX = centerX + Math.cos(rad) * 10
-              const startY = centerY + Math.sin(rad) * 10
-              
-              return (
-                <div
-                  key={index}
-                  style={{
-                    position: 'absolute',
-                    left: `${startX}%`,
-                    top: `${startY}%`,
-                    width: '12px',
-                    height: `${rayLength - 10}px`,
-                    background: 'linear-gradient(to bottom, rgba(156, 163, 175, 0.7), rgba(156, 163, 175, 0.4), transparent)',
-                    borderRadius: '6px',
-                    transformOrigin: 'top center',
-                    transform: `rotate(${angle}deg)`,
-                    filter: 'blur(10px)',
-                    opacity: 0.7,
-                  }}
-                />
-              )
-            })}
           </div>
         </Html>
       )}
@@ -166,8 +137,16 @@ export function QuizCard3D({
       {/* Сама карточка с фотографией */}
       <mesh
         ref={meshRef}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        onPointerOver={() => {
+          setHovered(true)
+          if (!isAnswered) {
+            document.body.style.cursor = 'pointer'
+          }
+        }}
+        onPointerOut={() => {
+          setHovered(false)
+          document.body.style.cursor = 'default'
+        }}
         onClick={() => !isAnswered && onCardClick()}
         scale={hovered && !isAnswered ? 1.1 : 1}
       >
@@ -210,35 +189,6 @@ export function QuizCard3D({
           </Html>
         )}
 
-        {/* Индикатор отвеченной карточки */}
-        {isAnswered && (
-          <Html
-            transform
-            distanceFactor={0.3}
-            position={[0, 0, 0.01]}
-            style={{
-              pointerEvents: 'none',
-              width: `${CARD_IMAGE_SIZE * 100}px`,
-              height: `${CARD_IMAGE_SIZE * 100}px`,
-            }}
-          >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(75, 85, 99, 0.8)',
-                borderRadius: '10px',
-              }}
-            >
-              <div style={{ fontSize: '36px', color: '#4ade80', marginBottom: '10px' }}>✓</div>
-              <div style={{ fontSize: '12px', color: '#9ca3af' }}>Отвечено</div>
-            </div>
-          </Html>
-        )}
       </mesh>
     </group>
   )

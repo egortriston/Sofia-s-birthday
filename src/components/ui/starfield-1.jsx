@@ -212,8 +212,8 @@ const Starfield = ({
       ) {
         // Увеличиваем яркость звезд - делаем линии толще и ярче
         const baseWidth = (1 - sd.current.star.colorRatio * star[2]) * 2;
-        ctx.lineWidth = Math.max(baseWidth * 2.5, 1); // Увеличиваем толщину в 2.5 раза, минимум 1px
-        ctx.globalAlpha = Math.min(1, 0.95 + (1 - sd.current.star.colorRatio * star[2]) * 0.3); // Увеличиваем прозрачность до 0.95-1.0
+        ctx.lineWidth = Math.max(baseWidth * 4, 1.5); // Увеличиваем толщину в 4 раза, минимум 1.5px
+        ctx.globalAlpha = 1; // Максимальная яркость - всегда 1.0
         ctx.beginPath();
         ctx.moveTo(star[5], star[6]);
         ctx.lineTo(star[3], star[4]);

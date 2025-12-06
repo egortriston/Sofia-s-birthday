@@ -1,16 +1,21 @@
 // Конфигурация Telegram Bot API
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN' // Замените на ваш токен бота
-const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID' // Замените на ваш chat_id
-const DIPSY_CHAT_ID = 'DIPSY_CHAT_ID' // Опционально: chat_id для Дипсика
+const TELEGRAM_BOT_TOKEN = '7948394824:AAHuh_71TCCtHNL0gPw5YFXfh0VvvU7QNtc'
+const TELEGRAM_CHAT_ID = '5882350650'
 
 export const sendToTelegram = async (question, userAnswer, correctAnswer, isCorrect) => {
-  const status = isCorrect ? 'Правильно' : 'Неправильно'
-  const message = `Вопрос: ${question}\nОтвет: ${userAnswer}\nВерный ответ: ${correctAnswer}\nСтатус: ${status}`
+  const status = isCorrect ? '✅ Принят' : '❌ Отклонен'
+  const emoji = isCorrect ? '✅' : '❌'
+  
+  const message = `${emoji} <b>Новый ответ на вопрос</b>\n\n` +
+    `<b>Вопрос:</b> ${question}\n\n` +
+    `<b>Ответ пользователя:</b> ${userAnswer}\n\n` +
+    `<b>Правильный ответ:</b> ${correctAnswer}\n\n` +
+    `<b>Статус:</b> ${status}`
   
   try {
     // Отправка вам
-    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID && TELEGRAM_CHAT_ID !== 'YOUR_CHAT_ID') {
+      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -18,22 +23,15 @@ export const sendToTelegram = async (question, userAnswer, correctAnswer, isCorr
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           text: message,
+          parse_mode: 'HTML',
         }),
       })
-    }
-
-    // Опциональная отправка Дипсику
-    if (DIPSY_CHAT_ID && TELEGRAM_BOT_TOKEN) {
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: DIPSY_CHAT_ID,
-          text: message,
-        }),
-      })
+      
+      if (!response.ok) {
+        console.error('Ошибка отправки в Telegram:', await response.text())
+      }
+    } else {
+      console.log('Telegram не настроен. Сообщение:', message)
     }
   } catch (error) {
     console.error('Ошибка отправки в Telegram:', error)

@@ -4,6 +4,8 @@ import { Starfield } from '@/components/ui/starfield-1'
 import AnoAI from '@/components/ui/animated-shader-background'
 import photo1 from '@/images/1.png'
 import photo2 from '@/images/2.png'
+import photo3 from '@/images/3.png'
+import photo4 from '@/images/4.png'
 import './Introduction.css'
 
 function Introduction() {
@@ -202,9 +204,24 @@ function Introduction() {
     <div ref={containerRef} className="relative w-full snap-container">
       {/* Первая секция с звездным фоном */}
       <div className="snap-section relative flex h-screen w-full flex-col items-center justify-center overflow-hidden">
-        <Starfield speed={0.15} starColor="rgb(255, 251, 0)" quantity={6000} />
-        <div className={`pointer-events-none z-10 text-center px-4 md:px-0 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
-          <h1 className="text-7xl leading-none font-semibold tracking-tighter whitespace-pre-wrap text-white mb-10">
+        <Starfield speed={0.95} starColor="rgb(12, 206, 255)" quantity={6000} />
+        
+        {/* Летающие фото - букет сзади текста */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 5 }}>
+          <img 
+            src={photo3} 
+            alt="Фото 3" 
+            className="floating-photo-3 absolute w-72 md:w-96 h-auto rounded-lg shadow-xl"
+          />
+          <img 
+            src={photo4} 
+            alt="Фото 4" 
+            className="floating-photo-4 absolute w-80 md:w-[28rem] h-auto rounded-lg shadow-xl"
+          />
+        </div>
+        
+        <div className={`pointer-events-none z-10 text-center px-6 md:px-4 py-4 md:py-0 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
+          <h1 className="text-6xl leading-none font-semibold tracking-tighter whitespace-pre-wrap text-white mb-10">
             Космическое приключение
           </h1>
           <div className="text-container max-w-3xl mx-auto mb-10 px-4 md:px-0">
@@ -232,7 +249,7 @@ function Introduction() {
         </div>
         
         <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-auto">
-          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-40 md:gap-60 items-center">
             {/* Левая половина - летающее фото */}
             <div className="flex items-center justify-center relative z-30">
               <div 
@@ -242,7 +259,7 @@ function Introduction() {
                 <img 
                   src={photo1} 
                   alt="Поздравление" 
-                  className="w-full max-w-md h-auto rounded-2xl shadow-2xl"
+                  className="photo-no-glow w-full max-w-md h-auto rounded-2xl shadow-2xl"
                   style={{ display: 'block' }}
                 />
               </div>
@@ -282,7 +299,7 @@ function Introduction() {
         <Starfield speed={0.55} starColor="rgba(255,255,255,1)" quantity={2400} />
         <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-4 md:py-12 min-h-0">
           {/* Контент: текст слева, фото справа */}
-          <div className={`w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center mb-4 md:mb-8 flex-shrink ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
+          <div className={`w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-40 md:gap-60 items-center mb-4 md:mb-8 flex-shrink ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
             {/* Левая половина - текст */}
             <div className="flex flex-col items-start justify-center text-white">
               <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import { Starfield } from '@/components/ui/starfield-1'
 import './Finale.css'
 import starWarsMusic from '@/music/John_Williams_-_Star_Wars_Main_Theme_and_Ambush_on_Coruscant_Zvezdnye_vojny_Ataka_klonov_(SkySound.cc).mp3'
 
@@ -66,8 +67,7 @@ function Finale() {
     ответила на все вопросы и доказала,
     что ты настоящая звезда!
     
-    Я прекрасно помню, что твой папа фанат серии Звездных войн, поэтому думаю, что вам зашла такая отсылка
-    .
+    Я прекрасно помню, что твой папа фанат серии Звездных войн, поэтому думаю, что вам зашла такая отсылка.
     
     Ты заслуживаешь всего самого лучшего!
     Я очень рад, что тебя встретил в том году! И надеюсь, что эта дружба протянется еще долгое время!
@@ -94,8 +94,7 @@ function Finale() {
 
   return (
     <div className="finale-page">
-      <div className="stars"></div>
-      <div className="twinkling"></div>
+      <Starfield speed={0.15} starColor="rgba(255,255,255,1)" quantity={2400} />
       
       <button 
         className="music-toggle"
