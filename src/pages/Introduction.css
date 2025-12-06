@@ -1,0 +1,124 @@
+/* Дополнительные стили для Introduction страницы */
+.text-container {
+  max-width: 800px;
+}
+
+/* Scroll snap для плавного перехода между слайдами */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  scroll-padding-top: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE и Edge */
+}
+
+/* Скрываем scrollbar для Chrome, Safari и Opera */
+.snap-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Плавная прокрутка для всех браузеров */
+.snap-container {
+  scroll-behavior: smooth;
+}
+
+/* Улучшенная плавность для WebKit */
+@supports (-webkit-overflow-scrolling: touch) {
+  .snap-container {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Улучшенные переходы для секций */
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  will-change: scroll-position;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Анимация летающего фото */
+.floating-photo {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1deg);
+  }
+  75% {
+    transform: translateY(-25px) rotate(1deg);
+  }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .text-7xl {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  
+  .text-xl {
+    font-size: 1rem;
+  }
+  
+  .text-lg {
+    font-size: 0.9rem;
+  }
+
+  .floating-photo img {
+    max-width: 100%;
+  }
+
+  /* Дополнительные отступы для мобильных устройств */
+  .snap-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .text-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* Уменьшаем отступы между элементами на мобильных */
+  .snap-section h1 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .snap-section .text-container {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Убеждаемся, что кнопка видна на мобильных */
+  .snap-section button {
+    position: relative;
+    z-index: 30;
+    min-width: 200px;
+  }
+
+  /* Уменьшаем размер фото на мобильных */
+  .floating-photo img {
+    max-width: 280px;
+  }
+}
+
