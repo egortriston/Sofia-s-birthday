@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { QuizCard3D } from './QuizCard3D'
 
-const SPHERE_RADIUS = 9
-const ROTATION_SPEED_Y = 0.0005
+const SPHERE_RADIUS = 11.5
+const ROTATION_SPEED_Y = 0.0004
 
 export function QuizCards3D({ 
   questions, 
@@ -13,6 +13,7 @@ export function QuizCards3D({
   getDifficultyColor
 }) {
   const groupRef = useRef(null)
+  const isInteractingRef = useRef(false)
 
   const cardPositions = useMemo(() => {
     const positions = []
@@ -48,9 +49,9 @@ export function QuizCards3D({
     return positions
   }, [questions.length])
 
-  // Вращение группы карточек
+  // Вращение группы карточек (останавливается, когда пользователь наводит курсор на карточку)
   useFrame(() => {
-    if (groupRef.current) {
+    if (groupRef.current && !isInteractingRef.current) {
       groupRef.current.rotation.y += ROTATION_SPEED_Y
     }
   })
@@ -71,6 +72,8 @@ export function QuizCards3D({
             difficultyColor={getDifficultyColor(question.difficulty)}
             onCardClick={() => onCardClick(question.id)}
             imageIndex={index}
+            onPointerOverCard={() => { isInteractingRef.current = true }}
+            onPointerOutCard={() => { isInteractingRef.current = false }}
           />
         )
       })}

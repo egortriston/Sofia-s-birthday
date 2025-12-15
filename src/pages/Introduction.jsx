@@ -1,14 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { Starfield } from '@/components/ui/starfield-1'
 import AnoAI from '@/components/ui/animated-shader-background'
+import { LampContainer } from '@/components/ui/lamp'
+import LightPillar from '@/components/ui/LightPillar'
 import photo1 from '@/images/1.png'
 import photo2 from '@/images/2.png'
-import photo3 from '@/images/3.png'
-import photo4 from '@/images/4.png'
+import photo13 from '@/images/13.png'
 import './Introduction.css'
 
-function Introduction() {
+function Introduction() { 
   const navigate = useNavigate()
   const [showContent, setShowContent] = useState(false)
   const [showSecondSection, setShowSecondSection] = useState(false)
@@ -202,41 +204,72 @@ function Introduction() {
 
   return (
     <div ref={containerRef} className="relative w-full snap-container">
-      {/* Первая секция с звездным фоном */}
-      <div className="snap-section relative flex h-screen w-full flex-col items-center justify-center overflow-hidden">
-        <Starfield speed={0.95} starColor="rgb(12, 206, 255)" quantity={6000} />
-        
-        {/* Летающие фото - букет сзади текста */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 5 }}>
-          <img 
-            src={photo3} 
-            alt="Фото 3" 
-            className="floating-photo-3 absolute w-72 md:w-96 h-auto rounded-lg shadow-xl"
-          />
-          <img 
-            src={photo4} 
-            alt="Фото 4" 
-            className="floating-photo-4 absolute w-80 md:w-[28rem] h-auto rounded-lg shadow-xl"
+      {/* Первая секция с световым столбом + эффект лампы и фото снизу */}
+      <div className="snap-section relative flex h-screen w-full flex-col items-center justify-start md:justify-start overflow-hidden pt-0 md:pt-0">
+        <div className="absolute inset-0">
+          <LightPillar
+            topColor="#1d2140"
+            bottomColor="#4c1d95"
+            intensity={0.9}
+            rotationSpeed={0.22}
+            glowAmount={0.006}
+            pillarWidth={3.0}
+            pillarHeight={0.5}
+            noiseIntensity={0.7}
+            pillarRotation={0}
+            interactive={false}
+            mixBlendMode="screen"
           />
         </div>
-        
-        <div className={`pointer-events-none z-10 text-center px-6 md:px-4 py-4 md:py-0 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
-          <h1 className="text-6xl leading-none font-semibold tracking-tighter whitespace-pre-wrap text-white mb-10">
-            Космическое приключение
-          </h1>
-          <div className="text-container max-w-3xl mx-auto mb-10 px-4 md:px-0">
-            <p className="greeting-text text-xl mb-6 text-white/90">
-              Добро пожаловать в космическое путешествие, Софья! 
-              Сегодня тебя ждет удивительное приключение среди звезд и планет.
-            </p>
-            <p className="rules-text text-lg mb-4 text-white/80">
-              Ты знаешь, что для меня ты всегда была и есть самая главная звездочка! Поэтому я хотел бы подарить такое маленкькое приключение, где ты - это главная звезда)
-            </p>
-            <p className="rules-text text-lg text-white/80">
-              Чуть позже я тебе объясню правила, а пока, с твоего разрешения, давай я тебя поздравлю)))
-            </p>
-          </div>
+
+        {/* Текст без лампы (фон только от LightPillar) */}
+        <div className={`pointer-events-none z-10 px-0 md:px-0 pt-4 md:pt-20 pb-2 md:pb-0 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            transition={{ delay: 0.2, duration: 0.9, ease: 'easeInOut' }}
+            className="text-center"
+          >
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(56,189,248,0.9)]">
+              Космическое приключение
+            </h1>
+            <div className="text-container max-w-3xl mx-auto mb-10 px-4 md:px-0">
+              <p className="greeting-text text-xl mb-6 text-white/90">
+                Добро пожаловать в космическое путешествие, Софья! 
+                Сегодня тебя ждет удивительное приключение среди звезд и планет.
+              </p>
+              <p className="rules-text text-lg mb-4 text-white/80">
+                Ты знаешь, что для меня ты всегда была и есть самая главная звездочка! Поэтому я хотел бы подарить такое маленкькое приключение, где ты - это главная звезда)
+              </p>
+              <p className="rules-text text-lg text-white/80">
+                Чуть позже я тебе объясню правила, а пока, с твоего разрешения, давай я тебя поздравлю)))
+              </p>
+            </div>
+          </motion.div>
         </div>
+
+        {/* Фото снизу с тёплым свечением лампы позади и лёгкой плавной анимацией */}
+        <motion.div
+          initial={{ opacity: 0, y: 120 }}
+          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 120 }}
+          transition={{ delay: 0.6, duration: 1.1, ease: 'easeOut' }}
+          className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center w-full"
+          style={{ zIndex: 5 }}
+        >
+          <LampContainer variant="photo">
+            <motion.img
+              src={photo13}
+              alt="Космическое фото"
+              className="relative w-[400px] md:w-70 lg:w-[30rem] h-auto rounded-3xl origin-bottom"
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          </LampContainer>
+        </motion.div>
       </div>
 
       {/* Вторая секция с анимированным фоном */}
@@ -249,7 +282,7 @@ function Introduction() {
         </div>
         
         <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-auto">
-          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-40 md:gap-60 items-center">
+          <div className="w-full max-w-7xl mx-auto px-0 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-60 items-center">
             {/* Левая половина - летающее фото */}
             <div className="flex items-center justify-center relative z-30">
               <div 
@@ -273,17 +306,17 @@ function Introduction() {
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 С Днем Рождения!
               </h2>
-              <div className="space-y-4 text-lg leading-relaxed">
+              <div className="space-y-4 text-base md:text-lg leading-relaxed">
                 <p className="text-white/90">
                   Дорогая Соша! Сегодня особенный день - день твоего рождения!
                 </p>
                 <p className="text-white/90">
-                  Я подготовил для тебя это космическое приключение, полное загадок и сюрпризов.
+                  Ты уже вообще взрослая. 21 год... Скоро уже и 25... а там уже не в моей зоне ответственности))
+                  Как и в любой другой день, я тебе желаю только всего самого лучшего!
                   Я не особо умею говорить красивые слова, но, надеюсь, мой подарок тебе понравится!
                 </p>
                 <p className="text-white/90">
-                  Ты мой самый дорогой человек и поэтому я постарался тебе сделать такой подарок, не знаю, видно ли это, но я потратил на это очень много сил! Поэтому я очень надеюсь, что он тебе западет в твое огромное сердце!
-
+                  Ты мой самый дорогой человек и поэтому я постарался тебе сделать такую открытку, не знаю, видно ли это, но я потратил на это очень много сил! Поэтому я очень надеюсь, что он тебе западет в твое огромное сердце!
                 </p>
               </div>
             </div>
@@ -299,7 +332,7 @@ function Introduction() {
         <Starfield speed={0.55} starColor="rgba(255,255,255,1)" quantity={2400} />
         <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-4 md:py-12 min-h-0">
           {/* Контент: текст слева, фото справа */}
-          <div className={`w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-40 md:gap-60 items-center mb-4 md:mb-8 flex-shrink ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
+          <div className={`w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-60 items-center mb-4 md:mb-8 flex-shrink ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
             {/* Левая половина - текст */}
             <div className="flex flex-col items-start justify-center text-white">
               <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -328,7 +361,7 @@ function Introduction() {
                 <img 
                   src={photo2} 
                   alt="Начать игру" 
-                  className="w-full max-w-md h-auto rounded-2xl shadow-2xl"
+                  className="w-52 md:w-full max-w-md h-auto rounded-2xl shadow-2xl"
                 />
               </div>
             </div>

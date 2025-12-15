@@ -264,19 +264,26 @@
 }
 
 .prize-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.95);
   border: 3px solid #4ade80;
   border-radius: 20px;
   padding: 30px;
-  z-index: 1000;
   animation: prizeAppear 0.5s ease;
   box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
   text-align: center;
   max-width: 400px;
+  width: 90%;
+  margin: 0 16px;
+}
+
+.prize-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
 }
 
 @keyframes prizeAppear {
@@ -375,8 +382,8 @@
   border-radius: 20px;
   max-width: 600px;
   width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
+  max-height: 90vh;
+  overflow-y: visible;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(102, 126, 234, 0.2);
   animation: slideUp 0.3s ease;
 }

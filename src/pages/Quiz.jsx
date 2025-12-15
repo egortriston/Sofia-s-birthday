@@ -4,6 +4,8 @@ import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import { ParticleSphere } from "@/components/ui/3d-orbit-gallery"
 import { QuizCards3D } from "@/components/ui/QuizCards3D"
+import { ElectricCard } from "@/components/ui/electric-card"
+import ElectricBorder from "@/components/ui/ElectricBorder"
 import { questions, hints } from '../data/questions'
 import { sendToTelegram } from '../utils/telegram'
 import './Quiz.css'
@@ -47,8 +49,10 @@ function Quiz() {
       setUserAnswers(prev => ({ ...prev, [cardId]: userAnswer }))
       setSelectedCard(null)
       setShowPrize(true)
-      setPrizeMessage(`Верно! Твой приз: ${question.prize}`)
-      setTimeout(() => setShowPrize(false), 3000)
+      const description = question.prizeDescription 
+        ? `${question.prize} — ${question.prizeDescription}`
+        : `Твой приз: ${question.prize}`
+      setPrizeMessage(`Верно! ${description}`)
     } else {
       const randomHint = hints[Math.floor(Math.random() * hints.length)]
       setDipsyMessage(`Не совсем! Подсказка: ${randomHint}`)
@@ -112,6 +116,7 @@ function Quiz() {
             onSubmit={(answer) => handleAnswerSubmit(selectedCard, answer)}
             onClose={() => setSelectedCard(null)}
             difficultyColor={getDifficultyColor(questions.find(q => q.id === selectedCard)?.difficulty)}
+            difficultyLabel={getDifficultyLabel(questions.find(q => q.id === selectedCard)?.difficulty)}
           />
         )}
 
@@ -123,9 +128,14 @@ function Quiz() {
         )}
 
         {showPrize && (
-          <div className="prize-popup pointer-events-auto">
-            <div className="prize-icon">🎁</div>
-            <div className="prize-message">{prizeMessage}</div>
+          <div 
+            className="prize-overlay pointer-events-auto"
+            onClick={() => setShowPrize(false)}
+          >
+            <div className="prize-popup" onClick={() => setShowPrize(false)}>
+              <div className="prize-icon">🎁</div>
+              <div className="prize-message">{prizeMessage}</div>
+            </div>
           </div>
         )}
 
@@ -142,7 +152,7 @@ function Quiz() {
   )
 }
 
-function QuestionModal({ question, onSubmit, onClose, difficultyColor }) {
+function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficultyLabel }) {
   const [answer, setAnswer] = useState('')
 
   if (!question) return null
@@ -160,33 +170,49 @@ function QuestionModal({ question, onSubmit, onClose, difficultyColor }) {
       <div 
         className="question-modal" 
         onClick={(e) => e.stopPropagation()}
-        style={{ borderColor: difficultyColor }}
       >
-        <div className="question-modal-header" style={{ borderBottomColor: difficultyColor }}>
-          <h3>Вопрос #{question.id}</h3>
-          <button className="question-modal-close" onClick={onClose}>×</button>
-        </div>
-        <div className="question-modal-content">
-          <p className="question-text">{question.question}</p>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              className="question-input"
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Введите ваш ответ..."
-              autoFocus
-            />
-            <div className="question-modal-buttons">
-              <button type="submit" className="question-submit-btn" style={{ backgroundColor: difficultyColor }}>
-                Ответить
-              </button>
-              <button type="button" className="question-cancel-btn" onClick={onClose}>
-                Отмена
-              </button>
-            </div>
-          </form>
-        </div>
+        <ElectricBorder
+          color={difficultyColor}
+          speed={1}
+          chaos={0.6}
+          thickness={2}
+          style={{ borderRadius: 20 }}
+        >
+          <ElectricCard
+            variant={question.difficulty === 'hard' ? 'hue' : 'swirl'}
+            color={difficultyColor}
+            badge={difficultyLabel}
+            title={`Вопрос #${question.id}`}
+            description={question.question}
+          >
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                className="question-input"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="Введите ваш ответ..."
+                autoFocus
+              />
+              <div className="question-modal-buttons">
+                <button
+                  type="submit"
+                  className="question-submit-btn"
+                  style={{ backgroundColor: difficultyColor }}
+                >
+                  Ответить
+                </button>
+                <button
+                  type="button"
+                  className="question-cancel-btn"
+                  onClick={onClose}
+                >
+                  Отмена
+                </button>
+              </div>
+            </form>
+          </ElectricCard>
+        </ElectricBorder>
       </div>
     </div>
   )

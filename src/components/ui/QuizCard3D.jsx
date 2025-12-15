@@ -23,7 +23,7 @@ import image219 from '../../images/2.19.jpg'
 import image220 from '../../images/2.20.jpg'
 import image221 from '../../images/2.21.jpg'
 
-const CARD_IMAGE_SIZE = 1.5
+const CARD_IMAGE_SIZE = 1.3
 
 // Массив всех изображений для карточек
 const cardImages = [
@@ -38,7 +38,9 @@ export function QuizCard3D({
   isAnswered, 
   difficultyColor,
   onCardClick,
-  imageIndex = 0
+  imageIndex = 0,
+  onPointerOverCard,
+  onPointerOutCard,
 }) {
   const meshRef = useRef()
   const [hovered, setHovered] = useState(false)
@@ -64,8 +66,8 @@ export function QuizCard3D({
           transform
           distanceFactor={0.6}
           position={[0, 0, -0.03]}
+          pointerEvents="none"
           style={{
-            pointerEvents: 'none',
             width: `${CARD_IMAGE_SIZE * 600}px`,
             height: `${CARD_IMAGE_SIZE * 600}px`,
             overflow: 'visible',
@@ -102,8 +104,8 @@ export function QuizCard3D({
           transform
           distanceFactor={0.6}
           position={[0, 0, -0.03]}
+          pointerEvents="none"
           style={{
-            pointerEvents: 'none',
             width: `${CARD_IMAGE_SIZE * 500}px`,
             height: `${CARD_IMAGE_SIZE * 500}px`,
             overflow: 'hidden',
@@ -139,16 +141,22 @@ export function QuizCard3D({
         ref={meshRef}
         onPointerOver={() => {
           setHovered(true)
+          if (onPointerOverCard) {
+            onPointerOverCard()
+          }
           if (!isAnswered) {
             document.body.style.cursor = 'pointer'
           }
         }}
         onPointerOut={() => {
           setHovered(false)
+          if (onPointerOutCard) {
+            onPointerOutCard()
+          }
           document.body.style.cursor = 'default'
         }}
         onClick={() => !isAnswered && onCardClick()}
-        scale={hovered && !isAnswered ? 1.1 : 1}
+        scale={hovered && !isAnswered ? 1.06 : 1}
       >
         <planeGeometry args={[CARD_IMAGE_SIZE, CARD_IMAGE_SIZE]} />
         <meshBasicMaterial 
@@ -164,9 +172,7 @@ export function QuizCard3D({
             transform
             distanceFactor={0.3}
             position={[-CARD_IMAGE_SIZE/2 + 0.1, CARD_IMAGE_SIZE/2 - 0.1, 0.01]}
-            style={{
-              pointerEvents: 'none',
-            }}
+            pointerEvents="none"
           >
             <div
               style={{
