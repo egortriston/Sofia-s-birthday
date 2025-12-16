@@ -41,13 +41,8 @@
 /* Улучшенные переходы для секций */
 .snap-section {
   scroll-snap-align: start;
-  scroll-snap-stop: always;
+  scroll-snap-stop: normal;
   will-change: scroll-position;
-}
-
-.snap-section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 /* Анимация летающего фото */

@@ -57,7 +57,7 @@
   text-align: justify;
   color: #ffd700;
   text-shadow: 0 0 15px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.6);
-  animation: crawl 75s linear;
+  animation: crawl 120s linear;
   animation-fill-mode: forwards;
   font-weight: 600;
   word-wrap: break-word;

@@ -50,7 +50,7 @@ function Quiz() {
       setSelectedCard(null)
       setShowPrize(true)
       const description = question.prizeDescription 
-        ? `${question.prize} — ${question.prizeDescription}`
+        ? `${question.prize} - ${question.prizeDescription}`
         : `Твой приз: ${question.prize}`
       setPrizeMessage(`Верно! ${description}`)
     } else {
@@ -85,7 +85,7 @@ function Quiz() {
   return (
     <div className="quiz-page relative w-full h-screen bg-black">
       {/* 3D Scene with Cards */}
-      <Canvas camera={{ position: [-10, 1.5, 10], fov: 50 }}>
+      <Canvas camera={{ position: [-13, 1.5, 10], fov: 50 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={null}>
@@ -97,7 +97,13 @@ function Quiz() {
             getDifficultyColor={getDifficultyColor}
           />
         </Suspense>
-        <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
+        <OrbitControls 
+          enablePan={true} 
+          enableZoom={true} 
+          enableRotate={true}
+         
+          makeDefault
+        />
       </Canvas>
 
       {/* UI Overlay */}

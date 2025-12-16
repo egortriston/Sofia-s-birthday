@@ -131,9 +131,9 @@ function Introduction() {
       if (!container) return
 
       const now = Date.now()
-      if (now - lastWheelTime < 150) {
+      if (now - lastWheelTime < 50) {
         e.preventDefault()
-        return // Дебаунс для плавности
+        return // Минимальный дебаунс для предотвращения множественных срабатываний
       }
       lastWheelTime = now
 
@@ -165,13 +165,13 @@ function Introduction() {
         }
 
         // Используем кастомную плавную прокрутку
-        smoothScrollTo(container, targetScroll, 800) // 800ms для плавного перехода
+        smoothScrollTo(container, targetScroll, 500) // 500ms для более быстрого перехода
 
         // Резервная блокировка на случай если анимация не завершится
         clearTimeout(scrollTimeout)
         scrollTimeout = setTimeout(() => {
           isScrolling.current = false
-        }, 1000)
+        }, 600)
       }
     }
 
@@ -227,7 +227,7 @@ function Introduction() {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ delay: 0.2, duration: 0.9, ease: 'easeInOut' }}
+            transition={{ delay: 0, duration: 0.9, ease: 'easeInOut' }}
             className="text-center"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(56,189,248,0.9)]">
@@ -252,7 +252,7 @@ function Introduction() {
         <motion.div
           initial={{ opacity: 0, y: 120 }}
           animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 120 }}
-          transition={{ delay: 0.6, duration: 1.1, ease: 'easeOut' }}
+          transition={{ delay: 1.1, duration: 1.1, ease: 'easeOut' }}
           className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center w-full"
           style={{ zIndex: 5 }}
         >
@@ -261,7 +261,7 @@ function Introduction() {
               src={photo13}
               alt="Космическое фото"
               className="relative w-[400px] md:w-70 lg:w-[30rem] h-auto rounded-3xl origin-bottom"
-              animate={{ scale: [1, 1.02, 1] }}
+              animate={{ scale: [1, 1.05, 1] }}
               transition={{
                 duration: 10,
                 repeat: Infinity,
