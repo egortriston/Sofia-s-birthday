@@ -1,4 +1,4 @@
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
@@ -33,16 +33,37 @@ function Quiz() {
 
     // Нормализация ответов: убираем пробелы, приводим к нижнему регистру
     const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, ' ')
-    const normalizedUserAnswer = normalize(userAnswer)
-    const normalizedCorrectAnswer = normalize(question.answer)
-    
-    // Специальная обработка для вопросов с "*любой ответ верен*"
-    const isCorrect = question.answer.includes('*любой ответ верен*') 
-      ? userAnswer.trim().length > 0  // Любой непустой ответ считается правильным
-      : normalizedUserAnswer === normalizedCorrectAnswer
+
+    let isCorrect = false
+    let userAnswerText = typeof userAnswer === 'string' ? userAnswer : ''
+
+    if (question.type === 'crossword') {
+      const solution = question.crosswordSolution || []
+      const grid = userAnswer?.gridValues || []
+      if (typeof userAnswer?.isCorrect === 'boolean') {
+        isCorrect = userAnswer.isCorrect
+      } else {
+        // Проверяем, что каждая активная клетка совпадает с решением
+        isCorrect = solution.every((row, ri) =>
+          row.every((cell, ci) => {
+            if (cell === null) return true
+            const val = grid?.[ri]?.[ci] || ''
+            return val.toUpperCase() === cell.toUpperCase()
+          })
+        )
+      }
+      userAnswerText = userAnswer?.userText || ''
+    } else {
+      const normalizedUserAnswer = normalize(userAnswer || '')
+      const normalizedCorrectAnswer = normalize(question.answer)
+      // Специальная обработка для вопросов с "*любой ответ верен*"
+      isCorrect = question.answer.includes('*любой ответ верен*') 
+        ? (userAnswer || '').trim().length > 0  // Любой непустой ответ считается правильным
+        : normalizedUserAnswer === normalizedCorrectAnswer
+    }
 
     // Отправка в Telegram
-    await sendToTelegram(question.question, userAnswer, question.answer, isCorrect)
+    await sendToTelegram(question.question, userAnswerText, question.answer, isCorrect)
 
     if (isCorrect) {
       setAnsweredCards(prev => new Set([...prev, cardId]))
@@ -158,8 +179,115 @@ function Quiz() {
   )
 }
 
+function CrosswordPuzzle({ solution, onSubmit, onClose, accentColor }) {
+  const [grid, setGrid] = useState(
+    () => (solution || []).map(row => row.map(cell => (cell === null ? null : '')))
+  )
+  const [error, setError] = useState('')
+  const [mismatches, setMismatches] = useState(null)
+
+  const columns = useMemo(() => {
+    if (!solution || solution.length === 0) return 0
+    return Math.max(...solution.map(row => row.length))
+  }, [solution])
+
+  const handleChange = (rowIndex, colIndex, value) => {
+    const normalized = value.replace(/[^А-Яа-яЁёA-Za-z]/g, '').slice(-1).toUpperCase()
+    setGrid(prev => prev.map((row, ri) =>
+      row.map((cell, ci) => {
+        if (ri === rowIndex && ci === colIndex && cell !== null) {
+          return normalized
+        }
+        return cell
+      })
+    ))
+    setMismatches(null)
+    setError('')
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const allFilled = solution.every((row, ri) =>
+      row.every((cell, ci) => cell === null || (grid?.[ri]?.[ci] || '').trim() !== '')
+    )
+
+    if (!allFilled) {
+      setError('Заполни все клетки.')
+      return
+    }
+
+    const mismatchMap = solution.map((row, ri) =>
+      row.map((cell, ci) => {
+        if (cell === null) return false
+        const val = (grid?.[ri]?.[ci] || '').toUpperCase()
+        return val !== cell.toUpperCase()
+      })
+    )
+
+    const hasMismatch = mismatchMap.some(row => row.some(Boolean))
+    setMismatches(mismatchMap)
+
+    const userText = (grid.flat().filter(Boolean).join('')) || ''
+    setError(hasMismatch ? 'Исправь выделенные клетки.' : '')
+    onSubmit({ gridValues: grid, userText, isCorrect: !hasMismatch })
+  }
+
+  if (!solution || columns === 0) return null
+
+  return (
+    <div className="crossword-wrapper" style={{ '--crossword-accent': accentColor }}>
+      <div className="crossword-hint">Введи буквы в каждую клетку и нажми «Проверить»</div>
+      <form onSubmit={handleSubmit}>
+        <div
+          className="crossword-grid"
+          style={{ gridTemplateColumns: `repeat(${columns}, 38px)` }}
+        >
+          {solution.map((row, ri) =>
+            row.map((cell, ci) => {
+              const key = `${ri}-${ci}`
+              if (cell === null) {
+                return <div key={key} className="crossword-cell blocked" />
+              }
+              const isWrong = mismatches?.[ri]?.[ci]
+              return (
+                <div key={key} className={`crossword-cell${isWrong ? ' wrong' : ''}`}>
+                  <input
+                    type="text"
+                    maxLength={1}
+                    className={`crossword-input${isWrong ? ' wrong' : ''}`}
+                    value={grid?.[ri]?.[ci] || ''}
+                    onChange={(e) => handleChange(ri, ci, e.target.value)}
+                  />
+                </div>
+              )
+            })
+          )}
+        </div>
+        {error && <div className="crossword-error">{error}</div>}
+        <div className="question-modal-buttons">
+          <button
+            type="submit"
+            className="question-submit-btn"
+            style={{ backgroundColor: accentColor }}
+          >
+            Проверить
+          </button>
+          <button
+            type="button"
+            className="question-cancel-btn"
+            onClick={onClose}
+          >
+            Отмена
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
 function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficultyLabel }) {
   const [answer, setAnswer] = useState('')
+  const isCrossword = question?.type === 'crossword'
 
   if (!question) return null
 
@@ -191,32 +319,43 @@ function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficult
             title={`Вопрос #${question.id}`}
             description={question.question}
           >
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                className="question-input"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Введите ваш ответ..."
-                autoFocus
+          <div className="question-content-scroll">
+            {isCrossword ? (
+              <CrosswordPuzzle
+                solution={question.crosswordSolution}
+                onSubmit={onSubmit}
+                onClose={onClose}
+                accentColor={difficultyColor}
               />
-              <div className="question-modal-buttons">
-                <button
-                  type="submit"
-                  className="question-submit-btn"
-                  style={{ backgroundColor: difficultyColor }}
-                >
-                  Ответить
-                </button>
-                <button
-                  type="button"
-                  className="question-cancel-btn"
-                  onClick={onClose}
-                >
-                  Отмена
-                </button>
-              </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  className="question-input"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder="Введите ваш ответ..."
+                  autoFocus
+                />
+                <div className="question-modal-buttons">
+                  <button
+                    type="submit"
+                    className="question-submit-btn"
+                    style={{ backgroundColor: difficultyColor }}
+                  >
+                    Ответить
+                  </button>
+                  <button
+                    type="button"
+                    className="question-cancel-btn"
+                    onClick={onClose}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
           </ElectricCard>
         </ElectricBorder>
       </div>

@@ -1,11 +1,31 @@
+// Решение кроссворда для вопроса #13.
+// null обозначает пустую (черную) клетку, буквы — правильные ответы.
+const crosswordSolution = [
+  ['Л', 'О', 'Н', 'Д', 'О', 'Н', null, null, null, null],
+  [null, null, null, 'Е', null, null, null, null, null, null],
+  [null, null, null, 'Т', null, null, null, 'М', null, null],
+  [null, null, 'К', 'С', null, null, null, 'О', null, null],
+  [null, null, 'А', 'Т', null, null, null, 'Р', null, null],
+  [null, null, 'Н', 'В', null, 'П', null, 'Я', 'Ц', null],
+  [null, null, 'К', 'О', 'Р', 'О', 'Б', 'К', 'А', null],
+  [null, null, 'А', null, 'Е', 'Е', 'У', null, 'Р', null],
+  [null, null, 'Н', null, 'Ж', 'З', 'Д', null, 'И', null],
+  [null, null, null, null, 'И', 'Д', 'И', null, 'Ц', null],
+  [null, null, null, null, 'С', 'А', 'Л', null, 'А', null],
+  [null, null, null, null, 'С', null, 'Ь', null, null, null],
+  [null, null, null, null, 'Ё', null, 'Н', null, null, null],
+  [null, null, null, null, 'Р', null, 'И', null, null, null],
+  [null, null, null, null, null, null, 'К', null, null, null]
+]
+
 export const questions = [
   // Легкие (1-7)
   {
     id: 1,
     difficulty: 'easy',
     question: 'Какую песню просил мужик сзади нас на концерте Уматурман',
-    answer: 'Серёга говорит',
-    prize: 'Брелок',
+    answer: 'Серега говорит',
+    prize: 'Брелок Уматурман',
     prizeDescription: 'Небольшой, но очень личный брелок, который будет каждый день напоминать про наш концерт и ту самую песню.'
   },
   {
@@ -102,6 +122,8 @@ export const questions = [
     difficulty: 'medium',
     question: 'Заполни красворд',
     answer: 'кросворд',
+    type: 'crossword',
+    crosswordSolution,
     prize: 'Кружка "Лучший Методист',
     prizeDescription: 'Твоя личная кружка “Лучший методист”, чтобы каждый чай или кофе напоминали, насколько ты крутая в своём деле.'
   },
@@ -120,7 +142,7 @@ export const questions = [
     question: 'Рогатый заяц, обитающий в лесах баварии',
     answer: 'вольпертингер',
     prize: 'Огромная банка с пивом вольпертингер',
-    prizeDescription: 'Огромная банка тематического пива “Вольпертингер” - максимально странный и забавный сувенир в духе самого существа.'
+    prizeDescription: 'Огромная банка тематического пива “Вольпертингер”. Помню ты его фанатка)).'
   },
   {
     id: 16,
