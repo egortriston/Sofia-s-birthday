@@ -21,6 +21,17 @@
   -ms-overflow-style: none; /* IE и Edge */
 }
 
+/* На мобильных отключаем snap-скролл */
+@media (max-width: 768px) {
+  .snap-container {
+    scroll-snap-type: none;
+  }
+  
+  .snap-section {
+    scroll-snap-align: none;
+  }
+}
+
 /* Скрываем scrollbar для Chrome, Safari и Opera */
 .snap-container::-webkit-scrollbar {
   display: none;

@@ -1,0 +1,211 @@
+.cosmic-loader-container {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f1e 50%, #000000 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.cosmic-loader {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 30px;
+}
+
+/* Центральная планета */
+.planet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+}
+
+.planet-core {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #667eea, #764ba2, #4c1d95);
+  box-shadow: 
+    0 0 20px rgba(102, 126, 234, 0.6),
+    0 0 40px rgba(118, 75, 162, 0.4),
+    inset -10px -10px 20px rgba(0, 0, 0, 0.3);
+  animation: planetPulse 2s ease-in-out infinite;
+}
+
+.planet-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 50%;
+  animation: ringRotate 3s linear infinite;
+}
+
+.planet-ring::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: #667eea;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #667eea;
+  transform: translateX(-50%);
+}
+
+/* Орбиты */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 50%;
+}
+
+.orbit-1 {
+  width: 100px;
+  height: 100px;
+  animation: orbitRotate 4s linear infinite;
+}
+
+.orbit-2 {
+  width: 140px;
+  height: 140px;
+  animation: orbitRotate 6s linear infinite reverse;
+}
+
+.orbit-3 {
+  width: 180px;
+  height: 180px;
+  animation: orbitRotate 8s linear infinite;
+}
+
+/* Частицы на орбитах */
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.particle-1 {
+  background: #667eea;
+  box-shadow: 0 0 10px #667eea, 0 0 20px #667eea;
+}
+
+.particle-2 {
+  background: #fbbf24;
+  box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.particle-3 {
+  background: #f87171;
+  box-shadow: 0 0 10px #f87171, 0 0 20px #f87171;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* Звезды на фоне */
+.stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px white;
+  animation: starTwinkle 2s ease-in-out infinite;
+}
+
+/* Текст */
+.cosmic-loader-text {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+  letter-spacing: 2px;
+  animation: textPulse 2s ease-in-out infinite;
+}
+
+/* Анимации */
+@keyframes planetPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 0 20px rgba(102, 126, 234, 0.6),
+      0 0 40px rgba(118, 75, 162, 0.4),
+      inset -10px -10px 20px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 30px rgba(102, 126, 234, 0.8),
+      0 0 60px rgba(118, 75, 162, 0.6),
+      inset -10px -10px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes ringRotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes orbitRotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes textPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+

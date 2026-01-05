@@ -8,6 +8,7 @@ import LightPillar from '@/components/ui/LightPillar'
 import photo1 from '@/images/1.png'
 import photo2 from '@/images/2.png'
 import photo13 from '@/images/13.png'
+import { SolarLoader } from "@/components/ui/solar-loader"
 import './Introduction.css'
 
 function Introduction() { 
@@ -18,37 +19,43 @@ function Introduction() {
   const containerRef = useRef(null)
   const secondSectionRef = useRef(null)
   const thirdSectionRef = useRef(null)
-  const isScrolling = useRef(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setTimeout(() => setShowContent(true), 500)
+    // Загружаем все изображения
+    const images = [photo1, photo2, photo13]
+    let loadedCount = 0
     
-    // Проверяем видимость секций сразу при загрузке
-    const checkVisibility = () => {
-      const container = containerRef.current
-      if (!container) return
-
-      if (secondSectionRef.current) {
-        const rect = secondSectionRef.current.getBoundingClientRect()
-        const containerRect = container.getBoundingClientRect()
-        const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
-        if (isVisible) {
-          setShowSecondSection(true)
-        }
-      }
-      if (thirdSectionRef.current) {
-        const rect = thirdSectionRef.current.getBoundingClientRect()
-        const containerRect = container.getBoundingClientRect()
-        const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
-        if (isVisible) {
-          setShowThirdSection(true)
-        }
+    const checkImageLoad = () => {
+      loadedCount++
+      if (loadedCount === images.length) {
+        // Все изображения загружены, даем небольшую задержку для рендеринга
+        setTimeout(() => {
+          setIsLoading(false)
+          setShowContent(true)
+        }, 300)
       }
     }
 
-    // Проверяем после небольшой задержки, чтобы DOM успел отрендериться
-    setTimeout(checkVisibility, 100)
+    images.forEach((imgSrc) => {
+      const img = new Image()
+      img.onload = checkImageLoad
+      img.onerror = checkImageLoad // Продолжаем даже если есть ошибки
+      img.src = imgSrc
+    })
   }, [])
+
+  useEffect(() => {
+    // Показываем секции после загрузки
+    if (!isLoading) {
+      // Даем небольшую задержку для рендеринга DOM
+      const timer = setTimeout(() => {
+        setShowSecondSection(true)
+        setShowThirdSection(true)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,121 +82,18 @@ function Introduction() {
     }
 
     const container = containerRef.current
-    if (container) {
+    if (container && !isLoading) {
       container.addEventListener('scroll', handleScroll)
       handleScroll() // Проверяем при загрузке
     }
-    window.addEventListener('scroll', handleScroll)
 
     return () => {
       if (container) {
         container.removeEventListener('scroll', handleScroll)
       }
-      window.removeEventListener('scroll', handleScroll)
     }
-  }, [])
+  }, [isLoading])
 
-  useEffect(() => {
-    let scrollTimeout = null
-    let lastWheelTime = 0
-    let scrollAnimationId = null
-
-    const smoothScrollTo = (element, target, duration) => {
-      const start = element.scrollTop
-      const change = target - start
-      const startTime = performance.now()
-
-      const animateScroll = (currentTime) => {
-        const elapsed = currentTime - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        
-        // Easing функция для более плавного перехода (ease-in-out-cubic)
-        const ease = progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2
-
-        element.scrollTop = start + change * ease
-
-        if (progress < 1) {
-          scrollAnimationId = requestAnimationFrame(animateScroll)
-        } else {
-          isScrolling.current = false
-          scrollAnimationId = null
-        }
-      }
-
-      scrollAnimationId = requestAnimationFrame(animateScroll)
-    }
-
-    const handleWheel = (e) => {
-      if (isScrolling.current) {
-        e.preventDefault()
-        return
-      }
-
-      const container = containerRef.current
-      if (!container) return
-
-      const now = Date.now()
-      if (now - lastWheelTime < 50) {
-        e.preventDefault()
-        return // Минимальный дебаунс для предотвращения множественных срабатываний
-      }
-      lastWheelTime = now
-
-      const sections = container.querySelectorAll('.snap-section')
-      const currentScroll = container.scrollTop
-      const windowHeight = window.innerHeight
-      const currentSection = Math.round(currentScroll / windowHeight)
-
-      let targetSection = currentSection
-      const threshold = 30 // Уменьшенный порог для более чувствительного скролла
-
-      if (e.deltaY > threshold && currentSection < sections.length - 1) {
-        targetSection = currentSection + 1
-        e.preventDefault()
-      } else if (e.deltaY < -threshold && currentSection > 0) {
-        targetSection = currentSection - 1
-        e.preventDefault()
-      } else {
-        return // Небольшой скролл - разрешаем обычную прокрутку
-      }
-
-      if (targetSection !== currentSection) {
-        isScrolling.current = true
-        const targetScroll = targetSection * windowHeight
-
-        // Отменяем предыдущую анимацию если она есть
-        if (scrollAnimationId) {
-          cancelAnimationFrame(scrollAnimationId)
-        }
-
-        // Используем кастомную плавную прокрутку
-        smoothScrollTo(container, targetScroll, 500) // 500ms для более быстрого перехода
-
-        // Резервная блокировка на случай если анимация не завершится
-        clearTimeout(scrollTimeout)
-        scrollTimeout = setTimeout(() => {
-          isScrolling.current = false
-        }, 600)
-      }
-    }
-
-    const container = containerRef.current
-    if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false })
-    }
-
-    return () => {
-      clearTimeout(scrollTimeout)
-      if (scrollAnimationId) {
-        cancelAnimationFrame(scrollAnimationId)
-      }
-      if (container) {
-        container.removeEventListener('wheel', handleWheel)
-      }
-    }
-  }, [])
 
   const handleStart = () => {
     try {
@@ -200,6 +104,11 @@ function Introduction() {
       // Fallback: прямая навигация через window.location
       window.location.href = '/quiz'
     }
+  }
+
+  // Экран загрузки
+  if (isLoading) {
+    return <SolarLoader size={60} speed={1} message="Загрузка твоего подарка..." />
   }
 
   return (
@@ -236,7 +145,6 @@ function Introduction() {
             <div className="text-container max-w-3xl mx-auto mb-10 px-4 md:px-0">
               <p className="greeting-text text-xl mb-6 text-white/90">
                 Добро пожаловать в космическое путешествие, Софья! 
-                Сегодня тебя ждет удивительное приключение среди звезд и планет.
               </p>
               <p className="rules-text text-lg mb-4 text-white/80">
                 Ты знаешь, что для меня ты всегда была и есть самая главная звездочка! Поэтому я хотел бы подарить такое маленкькое приключение, где ты - это главная звезда)
@@ -260,7 +168,7 @@ function Introduction() {
             <motion.img
               src={photo13}
               alt="Космическое фото"
-              className="relative w-[400px] md:w-70 lg:w-[30rem] h-auto rounded-3xl origin-bottom"
+              className="relative w-[400px] md:w-70 lg:w-[25%] h-auto rounded-3xl origin-bottom"
               animate={{ scale: [1, 1.05, 1] }}
               transition={{
                 duration: 10,

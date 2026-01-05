@@ -1,4 +1,4 @@
-import { useState, Suspense, useMemo } from 'react'
+import { useState, Suspense, useMemo, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
@@ -6,6 +6,7 @@ import { ParticleSphere } from "@/components/ui/3d-orbit-gallery"
 import { QuizCards3D } from "@/components/ui/QuizCards3D"
 import { ElectricCard } from "@/components/ui/electric-card"
 import ElectricBorder from "@/components/ui/ElectricBorder"
+import { SolarLoader } from "@/components/ui/solar-loader"
 import { questions, hints } from '../data/questions'
 import { sendToTelegram } from '../utils/telegram'
 import './Quiz.css'
@@ -19,6 +20,40 @@ function Quiz() {
   const [dipsyMessage, setDipsyMessage] = useState('')
   const [showPrize, setShowPrize] = useState(false)
   const [prizeMessage, setPrizeMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  const canvasReadyRef = useRef(false)
+  const cardsLoadedRef = useRef(false)
+
+  useEffect(() => {
+    // Fallback таймер на случай, если загрузка не отслеживается корректно
+    const fallbackTimer = setTimeout(() => {
+      if (isLoading) {
+        console.warn('Загрузка превысила таймаут, принудительно скрываем лоадер')
+        setIsLoading(false)
+      }
+    }, 10000) // 10 секунд максимум
+
+    return () => clearTimeout(fallbackTimer)
+  }, [isLoading])
+
+  const handleAllCardsLoaded = () => {
+    cardsLoadedRef.current = true
+    checkIfReady()
+  }
+
+  const handleCanvasReady = () => {
+    canvasReadyRef.current = true
+    checkIfReady()
+  }
+
+  const checkIfReady = () => {
+    // Ждем и Canvas, и все карточки
+    if (canvasReadyRef.current && cardsLoadedRef.current) {
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 300)
+    }
+  }
 
   const handleCardClick = (cardId) => {
     if (answeredCards.has(cardId)) return
@@ -103,10 +138,23 @@ function Quiz() {
     }
   }
 
+  // Экран загрузки
+  if (isLoading) {
+    return <SolarLoader size={60} speed={1} message="Загрузка карточек..." />
+  }
+
   return (
     <div className="quiz-page relative w-full h-screen bg-black">
       {/* 3D Scene with Cards */}
-      <Canvas camera={{ position: [-13, 1.5, 10], fov: 50 }}>
+      <Canvas 
+        camera={{ position: [-12, 1.5, 12], fov: 50 }}
+        onCreated={() => {
+          // Canvas готов, даем время на инициализацию
+          setTimeout(() => {
+            handleCanvasReady()
+          }, 200)
+        }}
+      >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={null}>
@@ -116,6 +164,7 @@ function Quiz() {
             answeredCards={answeredCards}
             onCardClick={handleCardClick}
             getDifficultyColor={getDifficultyColor}
+            onAllCardsLoaded={handleAllCardsLoaded}
           />
         </Suspense>
         <OrbitControls 

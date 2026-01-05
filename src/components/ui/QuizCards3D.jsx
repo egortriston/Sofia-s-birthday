@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { QuizCard3D } from './QuizCard3D'
@@ -10,10 +10,34 @@ export function QuizCards3D({
   questions, 
   answeredCards, 
   onCardClick, 
-  getDifficultyColor
+  getDifficultyColor,
+  onAllCardsLoaded
 }) {
   const groupRef = useRef(null)
   const isInteractingRef = useRef(false)
+  const [loadedCards, setLoadedCards] = useState(0)
+  const totalCards = questions.length
+
+  // Отслеживаем загрузку всех карточек
+  useEffect(() => {
+    if (loadedCards === totalCards && onAllCardsLoaded) {
+      // Небольшая задержка для плавного появления
+      setTimeout(() => {
+        onAllCardsLoaded()
+      }, 300)
+    }
+  }, [loadedCards, totalCards, onAllCardsLoaded])
+
+  // Вычисляем начальное вращение, чтобы первая карточка была видна
+  // Если 9-я карточка сейчас видна первой, нужно повернуть группу так, чтобы первая была видна
+  const initialRotation = useMemo(() => {
+    const count = questions.length
+    // Угол 9-й карточки (index 8)
+    const card9Angle = (8 / count) * Math.PI * 2
+    // Поворачиваем группу так, чтобы первая карточка была там, где сейчас 9-я
+    // Нужно повернуть на отрицательный угол 9-й карточки
+    return -card9Angle
+  }, [questions.length])
 
   const cardPositions = useMemo(() => {
     const positions = []
@@ -49,6 +73,13 @@ export function QuizCards3D({
     return positions
   }, [questions.length])
 
+  // Устанавливаем начальное вращение при монтировании
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = initialRotation
+    }
+  }, [initialRotation])
+
   // Вращение группы карточек (останавливается, когда пользователь наводит курсор на карточку)
   useFrame(() => {
     if (groupRef.current && !isInteractingRef.current) {
@@ -74,6 +105,7 @@ export function QuizCards3D({
             imageIndex={index}
             onPointerOverCard={() => { isInteractingRef.current = true }}
             onPointerOutCard={() => { isInteractingRef.current = false }}
+            onLoad={() => setLoadedCards(prev => prev + 1)}
           />
         )
       })}

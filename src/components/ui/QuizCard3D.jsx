@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Html, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import image21 from '../../images/2.1.jpg'
@@ -41,13 +41,26 @@ export function QuizCard3D({
   imageIndex = 0,
   onPointerOverCard,
   onPointerOutCard,
+  onLoad,
 }) {
   const meshRef = useRef()
   const [hovered, setHovered] = useState(false)
+  const hasLoadedRef = useRef(false)
   
   // Выбираем правильное изображение по индексу (imageIndex 0 = 2.1.jpg, imageIndex 1 = 2.2.jpg и т.д.)
   const selectedImage = cardImages[imageIndex] || cardImages[0]
   const texture = useTexture(selectedImage)
+  
+  // Уведомляем о загрузке текстуры (только один раз)
+  useEffect(() => {
+    if (texture && onLoad && !hasLoadedRef.current) {
+      hasLoadedRef.current = true
+      // Небольшая задержка для гарантии, что текстура полностью загружена
+      requestAnimationFrame(() => {
+        onLoad()
+      })
+    }
+  }, [texture, onLoad])
   
   // Настройка текстуры
   if (texture) {
@@ -83,15 +96,16 @@ export function QuizCard3D({
               justifyContent: 'center',
             }}
           >
-            {/* Легкое размытое свечение цвета карточки по уровню сложности на всю фотку */}
+            {/* Яркое размытое свечение цвета карточки по уровню сложности на всю фотку */}
             <div
               style={{
                 position: 'absolute',
-                width: '110%',
-                height: '110%',
-                background: `radial-gradient(circle, ${color}AA 0%, ${color}88 7%, ${color}66 20%, ${color}55 30%, ${color}44 45%, ${color}33 60%, ${color}22 80%, transparent 100%)`,
-                filter: 'blur(70px)',
+                width: '120%',
+                height: '120%',
+                background: `radial-gradient(circle, ${color}FF 0%, ${color}DD 5%, ${color}BB 15%, ${color}99 25%, ${color}77 40%, ${color}55 55%, ${color}44 70%, ${color}33 85%, transparent 100%)`,
+                filter: 'blur(80px)',
                 borderRadius: '50%',
+                opacity: 0.9,
               }}
             />
           </div>
@@ -166,34 +180,34 @@ export function QuizCard3D({
           side={THREE.DoubleSide}
         />
       
-        {/* Overlay с номером в углу */}
-        {!isAnswered && (
-          <Html
-            transform
-            distanceFactor={0.3}
-            position={[-CARD_IMAGE_SIZE/2 + 0.1, CARD_IMAGE_SIZE/2 - 0.1, 0.01]}
-            pointerEvents="none"
+        {/* Overlay с номером в углу - показываем для всех карточек */}
+        <Html
+          transform
+          distanceFactor={0.3}
+          position={[-CARD_IMAGE_SIZE/2 + 0.1, CARD_IMAGE_SIZE/2 - 0.1, 0.01]}
+          pointerEvents="none"
+        >
+          <div
+            style={{
+              background: isAnswered ? 'rgba(156, 163, 175, 0.8)' : color,
+              borderRadius: '50%',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: 'white',
+              boxShadow: isAnswered 
+                ? '0 0 5px rgba(156, 163, 175, 0.4)' 
+                : `0 0 8px ${color}80, 0 0 12px ${color}40`,
+              border: '2px solid rgba(255, 255, 255, 0.3)',
+            }}
           >
-            <div
-              style={{
-                background: color,
-                borderRadius: '50%',
-                width: '30px',
-                height: '30px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                color: 'white',
-                boxShadow: `0 0 5px ${color}40`,
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-              }}
-            >
-              {question.id}
-            </div>
-          </Html>
-        )}
+            {question.id}
+          </div>
+        </Html>
 
       </mesh>
     </group>
