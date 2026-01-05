@@ -114,6 +114,7 @@ const Starfield = ({
 
   const resize = () => {
     const oldStar = { ...sd.current.star };
+    const oldZ = sd.current.z;
     measureViewport();
     sd.current.cw = sd.current.ctx?.canvas.width;
     sd.current.ch = sd.current.ctx?.canvas.height;
@@ -121,11 +122,13 @@ const Starfield = ({
     if (sd.current.cw !== sd.current.w || sd.current.ch !== sd.current.h) {
       sd.current.x = Math.round(sd.current.w / 2);
       sd.current.y = Math.round(sd.current.h / 2);
-      sd.current.z = (sd.current.w + sd.current.h) / 2;
+      const newZ = (sd.current.w + sd.current.h) / 2;
+      const zRatio = oldZ > 0 ? newZ / oldZ : 1;
+      sd.current.z = newZ;
       sd.current.star.colorRatio = 1 / sd.current.z;
 
-      const rw = sd.current.w / sd.current.cw;
-      const rh = sd.current.h / sd.current.ch;
+      const rw = sd.current.cw > 0 ? sd.current.w / sd.current.cw : 1;
+      const rh = sd.current.ch > 0 ? sd.current.h / sd.current.ch : 1;
 
       sd.current.ctx.canvas.width = sd.current.w;
       sd.current.ctx.canvas.height = sd.current.h;
@@ -135,8 +138,12 @@ const Starfield = ({
       } else {
         sd.current.star.arr = sd.current.star.arr.map((star, i) => {
           const newStar = [...star];
+          // Масштабируем позиции, сохраняя углы
           newStar[0] = oldStar.arr[i][0] * rw;
           newStar[1] = oldStar.arr[i][1] * rh;
+          // Масштабируем глубину (z) пропорционально изменению размера экрана
+          newStar[2] = oldStar.arr[i][2] * zRatio;
+          // Пересчитываем экранные координаты с сохранением углов
           newStar[3] = sd.current.x + (newStar[0] / newStar[2]) * ratio;
           newStar[4] = sd.current.y + (newStar[1] / newStar[2]) * ratio;
           return newStar;
@@ -153,33 +160,45 @@ const Starfield = ({
     mouse.current.y = (cursor.current.y - sd.current.y) / easing;
 
     if (sd.current.star.arr.length > 0) {
+      // Нормализуем скорость относительно базового размера экрана (1920x1080)
+      // чтобы скорость была одинаковой на всех разрешениях
+      const baseSize = 1920 + 1080; // Базовый размер для нормализации
+      const currentSize = sd.current.w + sd.current.h;
+      const speedMultiplier = baseSize / currentSize;
+      const normalizedSpeed = compSpeed * speedMultiplier;
+
       sd.current.star.arr = sd.current.star.arr.map(star => {
         const newStar = [...star];
         newStar[7] = true;
         newStar[5] = newStar[3];
         newStar[6] = newStar[4];
-        newStar[0] += mouse.current.x >> 4;
+        
+        // Используем нормализованное значение для движения мыши
+        const mouseXDelta = mouse.current.x / 16; // Заменяем >> 4 на / 16 для более предсказуемого поведения
+        const mouseYDelta = mouse.current.y / 16;
+        newStar[0] += mouseXDelta;
 
-        if (newStar[0] > sd.current.x << 1) {
-          newStar[0] -= sd.current.w << 1;
+        if (newStar[0] > sd.current.x * 2) {
+          newStar[0] -= sd.current.w * 2;
           newStar[7] = false;
         }
-        if (newStar[0] < -sd.current.x << 1) {
-          newStar[0] += sd.current.w << 1;
-          newStar[7] = false;
-        }
-
-        newStar[1] += mouse.current.y >> 4;
-        if (newStar[1] > sd.current.y << 1) {
-          newStar[1] -= sd.current.h << 1;
-          newStar[7] = false;
-        }
-        if (newStar[1] < -sd.current.y << 1) {
-          newStar[1] += sd.current.h << 1;
+        if (newStar[0] < -sd.current.x * 2) {
+          newStar[0] += sd.current.w * 2;
           newStar[7] = false;
         }
 
-        newStar[2] -= compSpeed;
+        newStar[1] += mouseYDelta;
+        if (newStar[1] > sd.current.y * 2) {
+          newStar[1] -= sd.current.h * 2;
+          newStar[7] = false;
+        }
+        if (newStar[1] < -sd.current.y * 2) {
+          newStar[1] += sd.current.h * 2;
+          newStar[7] = false;
+        }
+
+        // Используем нормализованную скорость
+        newStar[2] -= normalizedSpeed;
         if (newStar[2] > sd.current.z) {
           newStar[2] -= sd.current.z;
           newStar[7] = false;

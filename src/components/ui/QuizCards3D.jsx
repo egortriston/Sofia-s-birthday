@@ -21,10 +21,8 @@ export function QuizCards3D({
   // Отслеживаем загрузку всех карточек
   useEffect(() => {
     if (loadedCards === totalCards && onAllCardsLoaded) {
-      // Небольшая задержка для плавного появления
-      setTimeout(() => {
-        onAllCardsLoaded()
-      }, 300)
+      // Вызываем сразу, без задержки, так как карточки уже рендерятся
+      onAllCardsLoaded()
     }
   }, [loadedCards, totalCards, onAllCardsLoaded])
 

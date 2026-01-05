@@ -6,7 +6,7 @@ import AnoAI from '@/components/ui/animated-shader-background'
 import { LampContainer } from '@/components/ui/lamp'
 import LightPillar from '@/components/ui/LightPillar'
 import photo1 from '@/images/1.png'
-import photo2 from '@/images/2.png'
+import photo2 from '@/images/2new.png'
 import photo13 from '@/images/13.png'
 import { SolarLoader } from "@/components/ui/solar-loader"
 import './Introduction.css'
@@ -114,7 +114,7 @@ function Introduction() {
   return (
     <div ref={containerRef} className="relative w-full snap-container">
       {/* Первая секция с световым столбом + эффект лампы и фото снизу */}
-      <div className="snap-section relative flex h-screen w-full flex-col items-center justify-start md:justify-start overflow-hidden pt-0 md:pt-0">
+      <div className="snap-section relative flex min-h-screen md:h-screen w-full flex-col items-center justify-start md:justify-start overflow-hidden pt-0 md:pt-0 pb-8 md:pb-0">
         <div className="absolute inset-0">
           <LightPillar
             topColor="#1d2140"
@@ -132,24 +132,24 @@ function Introduction() {
         </div>
 
         {/* Текст без лампы (фон только от LightPillar) */}
-        <div className={`pointer-events-none z-10 px-0 md:px-0 pt-4 md:pt-20 pb-2 md:pb-0 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
+        <div className={`pointer-events-none z-10 px-4 md:px-0 pt-4 md:pt-20 pb-2 md:pb-0 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
             transition={{ delay: 0, duration: 0.9, ease: 'easeInOut' }}
             className="text-center"
           >
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(56,189,248,0.9)]">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(56,189,248,0.9)]">
               Космическое приключение
             </h1>
-            <div className="text-container max-w-3xl mx-auto mb-10 px-4 md:px-0">
-              <p className="greeting-text text-xl mb-6 text-white/90">
+            <div className="text-container max-w-3xl mx-auto mb-6 md:mb-10 px-4 md:px-0">
+              <p className="greeting-text text-lg md:text-xl mb-4 md:mb-6 text-white/90">
                 Добро пожаловать в космическое путешествие, Софья! 
               </p>
-              <p className="rules-text text-lg mb-4 text-white/80">
+              <p className="rules-text text-base md:text-lg mb-3 md:mb-4 text-white/80">
                 Ты знаешь, что для меня ты всегда была и есть самая главная звездочка! Поэтому я хотел бы подарить такое маленкькое приключение, где ты - это главная звезда)
               </p>
-              <p className="rules-text text-lg text-white/80">
+              <p className="rules-text text-base md:text-lg text-white/80">
                 Чуть позже я тебе объясню правила, а пока, с твоего разрешения, давай я тебя поздравлю)))
               </p>
             </div>
@@ -183,14 +183,14 @@ function Introduction() {
       {/* Вторая секция с анимированным фоном */}
       <div 
         ref={secondSectionRef}
-        className="snap-section relative flex h-screen w-full overflow-hidden"
+        className="snap-section relative flex min-h-screen md:h-screen w-full overflow-hidden py-4 md:py-0"
       >
         <div className="absolute inset-0 z-0">
           <AnoAI />
         </div>
         
         <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-auto">
-          <div className="w-full max-w-7xl mx-auto px-0 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-60 items-center">
+          <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-60 items-center">
             {/* Левая половина - летающее фото */}
             <div className="flex items-center justify-center relative z-30">
               <div 
@@ -211,10 +211,10 @@ function Introduction() {
               className={`flex flex-col items-start justify-center text-white relative z-30 ${showSecondSection ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'} transition-all duration-1000 delay-300 ease-out`}
               style={{ visibility: showSecondSection ? 'visible' : 'visible' }}
             >
-              <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 С Днем Рождения!
               </h2>
-              <div className="space-y-4 text-base md:text-lg leading-relaxed">
+              <div className="space-y-3 md:space-y-4 text-base md:text-lg leading-relaxed">
                 <p className="text-white/90">
                   Дорогая Соша! Сегодня особенный день - день твоего рождения!
                 </p>
@@ -235,15 +235,15 @@ function Introduction() {
       {/* Третья секция с кнопкой */}
       <div 
         ref={thirdSectionRef}
-        className="snap-section relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-900/20 to-black"
+        className="snap-section relative flex min-h-screen md:h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-900/20 to-black py-4 md:py-0"
       >
         <Starfield speed={0.55} starColor="rgba(255,255,255,1)" quantity={2400} />
-        <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-4 md:py-12 min-h-0">
+        <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-4 md:py-12 min-h-0 gap-2 md:gap-0">
           {/* Контент: текст слева, фото справа */}
-          <div className={`w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-60 items-center mb-4 md:mb-8 flex-shrink ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
+          <div className={`w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-60 items-center mb-4 md:mb-8 flex-shrink ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000`}>
             {/* Левая половина - текст */}
             <div className="flex flex-col items-start justify-center text-white">
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 А теперь суть подарка!
               </h2>
               <div className="space-y-2 md:space-y-4 text-sm md:text-lg leading-relaxed">
@@ -262,21 +262,21 @@ function Introduction() {
             </div>
 
             {/* Правая половина - фото */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center -mt-8 md:mt-12">
               <div 
                 className={`floating-photo ${showThirdSection ? 'opacity-100 scale-100' : 'opacity-0 scale-90'} transition-all duration-1000 delay-300`}
               >
                 <img 
                   src={photo2} 
                   alt="Начать игру" 
-                  className="w-52 md:w-full max-w-md h-auto rounded-2xl shadow-2xl"
+                  className="w-52 md:w-[70%] max-w-md h-auto rounded-2xl shadow-2xl m-4"
                 />
               </div>
             </div>
           </div>
 
           {/* Кнопка внизу */}
-          <div className={`w-full flex justify-center mt-4 md:mt-0 flex-shrink-0 ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000 delay-500`}>
+          <div className={`w-full flex justify-center mt-0 md:mt-0 flex-shrink-0 mb-4 md:mb-0 ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000 delay-500`}>
             <button 
               className="pointer-events-auto z-30 relative px-8 md:px-16 py-4 md:py-6 text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 hover:scale-110 transform"
               onClick={handleStart}

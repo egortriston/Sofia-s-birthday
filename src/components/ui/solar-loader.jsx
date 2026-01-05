@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./solar-loader.css";
 
 export function SolarLoader({
@@ -9,6 +9,20 @@ export function SolarLoader({
   className = "",
   message,
 }) {
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
+  // Адаптируем размер для мобильных устройств
+  const adaptedSize = isMobile ? Math.min(size, 30) : size
+  
   const planets = [
     { name: "Mercury", color: "from-gray-500 to-gray-800 dark:from-gray-300 dark:to-gray-600", orbit: 2.5, size: 0.3, duration: 2 },
     { name: "Venus", color: "from-yellow-400 to-yellow-700 dark:from-yellow-200 dark:to-yellow-500", orbit: 3.5, size: 0.4, duration: 3 },
@@ -26,8 +40,10 @@ export function SolarLoader({
         <div
           className={`relative mx-auto flex items-center justify-center ${className}`}
           style={{
-            width: `${size * 10}px`,
-            height: `${size * 10}px`,
+            width: `${adaptedSize * 10}px`,
+            height: `${adaptedSize * 10}px`,
+            maxWidth: isMobile ? '90vw' : 'none',
+            maxHeight: isMobile ? '90vw' : 'none',
             perspective: "1200px",
           }}
         >
@@ -39,8 +55,8 @@ export function SolarLoader({
             <div
               className="absolute left-1/2 top-40 bg-gradient-to-r from-neutral-300/70 to-neutral-500/70 dark:from-neutral-500/60 dark:to-neutral-300/60"
               style={{
-                width: `${size * 10}px`,
-                height: "1.5px",
+                width: `${adaptedSize * 10}px`,
+                height: isMobile ? "1px" : "1.5px",
                 transform: "translate(-50%, -50%) rotate(38deg)",
                 boxShadow: "0 0 8px rgba(255,255,255,0.3)",
                 zIndex: 0,
@@ -52,8 +68,8 @@ export function SolarLoader({
               className="absolute flex items-center justify-center rounded-full shadow-lg
                          bg-gradient-to-br from-yellow-300 to-orange-500 dark:from-yellow-200 dark:to-orange-400"
               style={{
-                width: `${size}px`,
-                height: `${size}px`,
+                width: `${adaptedSize}px`,
+                height: `${adaptedSize}px`,
                 boxShadow:
                   "0 0 40px rgba(255, 200, 0, 0.7), inset 0 0 15px rgba(255,255,255,0.5)",
                 transform: "translateZ(30px)",
@@ -67,8 +83,8 @@ export function SolarLoader({
                 key={i}
                 className="absolute rounded-full border border-neutral-300 dark:border-neutral-700"
                 style={{
-                  width: `${planet.orbit * size}px`,
-                  height: `${planet.orbit * size}px`,
+                  width: `${planet.orbit * adaptedSize}px`,
+                  height: `${planet.orbit * adaptedSize}px`,
                   animation: `orbit3d ${planet.duration / speed}s linear infinite`,
                   transformStyle: "preserve-3d",
                   transform: `rotateX(20deg) translateZ(${(i % 2 === 0 ? 1 : -1) * 25}px)`,
@@ -77,8 +93,8 @@ export function SolarLoader({
                 <div
                   className={`absolute rounded-full bg-gradient-to-br ${planet.color} shadow-inner`}
                   style={{
-                    width: `${planet.size * size}px`,
-                    height: `${planet.size * size}px`,
+                    width: `${planet.size * adaptedSize}px`,
+                    height: `${planet.size * adaptedSize}px`,
                     top: "50%",
                     left: "100%",
                     transform: "translate(-50%, -50%) rotateX(15deg)",
@@ -90,8 +106,8 @@ export function SolarLoader({
                   <div
                     className="absolute rounded-full bg-white/40 blur-[2px]"
                     style={{
-                      width: `${planet.size * size * 0.3}px`,
-                      height: `${planet.size * size * 0.3}px`,
+                      width: `${planet.size * adaptedSize * 0.3}px`,
+                      height: `${planet.size * adaptedSize * 0.3}px`,
                       top: "25%",
                       left: "25%",
                       opacity: 0.6,
@@ -103,8 +119,8 @@ export function SolarLoader({
                     <div
                       className="absolute bg-gradient-to-r from-neutral-300 to-neutral-500 dark:from-neutral-400 dark:to-neutral-200 opacity-80"
                       style={{
-                        width: `${planet.size * size * 2}px`,
-                        height: "1.5px",
+                        width: `${planet.size * adaptedSize * 2}px`,
+                        height: isMobile ? "1px" : "1.5px",
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%) rotate(25deg)",

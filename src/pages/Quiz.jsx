@@ -8,14 +8,37 @@ import { ElectricCard } from "@/components/ui/electric-card"
 import ElectricBorder from "@/components/ui/ElectricBorder"
 import { SolarLoader } from "@/components/ui/solar-loader"
 import { questions, hints } from '../data/questions'
-import { sendToTelegram } from '../utils/telegram'
+import { sendToTelegram, sendCompletionMessage } from '../utils/telegram'
 import './Quiz.css'
 
 function Quiz() {
   const navigate = useNavigate()
   const [selectedCard, setSelectedCard] = useState(null)
-  const [answeredCards, setAnsweredCards] = useState(new Set())
-  const [userAnswers, setUserAnswers] = useState({})
+  
+  // Загружаем прогресс из localStorage при инициализации
+  const loadProgress = () => {
+    try {
+      const savedAnswered = localStorage.getItem('quiz-progress-answered')
+      const savedAnswers = localStorage.getItem('quiz-progress-answers')
+      
+      const answeredSet = savedAnswered 
+        ? new Set(JSON.parse(savedAnswered).map(Number))
+        : new Set()
+      
+      const answersObj = savedAnswers 
+        ? JSON.parse(savedAnswers)
+        : {}
+      
+      return { answeredSet, answersObj }
+    } catch (error) {
+      console.error('Ошибка при загрузке прогресса:', error)
+      return { answeredSet: new Set(), answersObj: {} }
+    }
+  }
+
+  const { answeredSet, answersObj } = loadProgress()
+  const [answeredCards, setAnsweredCards] = useState(answeredSet)
+  const [userAnswers, setUserAnswers] = useState(answersObj)
   const [showDipsy, setShowDipsy] = useState(false)
   const [dipsyMessage, setDipsyMessage] = useState('')
   const [showPrize, setShowPrize] = useState(false)
@@ -23,6 +46,24 @@ function Quiz() {
   const [isLoading, setIsLoading] = useState(true)
   const canvasReadyRef = useRef(false)
   const cardsLoadedRef = useRef(false)
+
+  // Сохраняем прогресс в localStorage при изменении
+  useEffect(() => {
+    try {
+      const answeredArray = Array.from(answeredCards)
+      localStorage.setItem('quiz-progress-answered', JSON.stringify(answeredArray))
+    } catch (error) {
+      console.error('Ошибка при сохранении прогресса:', error)
+    }
+  }, [answeredCards])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('quiz-progress-answers', JSON.stringify(userAnswers))
+    } catch (error) {
+      console.error('Ошибка при сохранении ответов:', error)
+    }
+  }, [userAnswers])
 
   useEffect(() => {
     // Fallback таймер на случай, если загрузка не отслеживается корректно
@@ -49,9 +90,11 @@ function Quiz() {
   const checkIfReady = () => {
     // Ждем и Canvas, и все карточки
     if (canvasReadyRef.current && cardsLoadedRef.current) {
+      // Добавляем задержку 2 секунды, чтобы карточки успели отобразиться
+      // Теперь карточки рендерятся сразу, поэтому задержка нужна только для визуального эффекта
       setTimeout(() => {
         setIsLoading(false)
-      }, 300)
+      }, 2000)
     }
   }
 
@@ -66,8 +109,27 @@ function Quiz() {
     const question = questions.find(q => q.id === cardId)
     if (!question) return
 
-    // Нормализация ответов: убираем пробелы, приводим к нижнему регистру
-    const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, ' ')
+    // Нормализация букв: ё = е
+    const normalizeLetter = (char) => {
+      if (char === 'ё' || char === 'Ё') return 'е'
+      if (char === 'е' || char === 'Е') return 'е'
+      return char.toLowerCase()
+    }
+
+    // Нормализация ответов: убираем пробелы, приводим к нижнему регистру, заменяем ё на е
+    const normalize = (str) => {
+      return str.trim()
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/\s+/g, ' ')
+    }
+
+    // Нормализация для сравнения букв (для кроссворда)
+    const normalizeChar = (char) => {
+      const upper = char.toUpperCase()
+      if (upper === 'Ё' || upper === 'Е') return 'Е'
+      return upper
+    }
 
     let isCorrect = false
     let userAnswerText = typeof userAnswer === 'string' ? userAnswer : ''
@@ -78,12 +140,12 @@ function Quiz() {
       if (typeof userAnswer?.isCorrect === 'boolean') {
         isCorrect = userAnswer.isCorrect
       } else {
-        // Проверяем, что каждая активная клетка совпадает с решением
+        // Проверяем, что каждая активная клетка совпадает с решением (ё = е)
         isCorrect = solution.every((row, ri) =>
           row.every((cell, ci) => {
             if (cell === null) return true
             const val = grid?.[ri]?.[ci] || ''
-            return val.toUpperCase() === cell.toUpperCase()
+            return normalizeChar(val) === normalizeChar(cell)
           })
         )
       }
@@ -120,6 +182,13 @@ function Quiz() {
   const progress = answeredCards.size
   const allAnswered = progress === 21
 
+  // Отправляем сообщение в Telegram, когда все вопросы отвечены
+  useEffect(() => {
+    if (allAnswered) {
+      sendCompletionMessage()
+    }
+  }, [allAnswered])
+
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case 'easy': return '#4ade80'
@@ -138,14 +207,9 @@ function Quiz() {
     }
   }
 
-  // Экран загрузки
-  if (isLoading) {
-    return <SolarLoader size={60} speed={1} message="Загрузка карточек..." />
-  }
-
   return (
     <div className="quiz-page relative w-full h-screen bg-black">
-      {/* 3D Scene with Cards */}
+      {/* 3D Scene with Cards - рендерим всегда, чтобы карточки загружались */}
       <Canvas 
         camera={{ position: [-12, 1.5, 12], fov: 50 }}
         onCreated={() => {
@@ -175,6 +239,11 @@ function Quiz() {
           makeDefault
         />
       </Canvas>
+
+      {/* Лоадер поверх Canvas */}
+      {isLoading && (
+        <SolarLoader size={60} speed={1} message="Загрузка карточек..." />
+      )}
 
       {/* UI Overlay */}
       <div className="absolute top-0 left-0 right-0 z-20">
@@ -265,11 +334,18 @@ function CrosswordPuzzle({ solution, onSubmit, onClose, accentColor }) {
       return
     }
 
+    // Нормализация для сравнения букв (ё = е)
+    const normalizeChar = (char) => {
+      const upper = char.toUpperCase()
+      if (upper === 'Ё' || upper === 'Е') return 'Е'
+      return upper
+    }
+
     const mismatchMap = solution.map((row, ri) =>
       row.map((cell, ci) => {
         if (cell === null) return false
-        const val = (grid?.[ri]?.[ci] || '').toUpperCase()
-        return val !== cell.toUpperCase()
+        const val = grid?.[ri]?.[ci] || ''
+        return normalizeChar(val) !== normalizeChar(cell)
       })
     )
 

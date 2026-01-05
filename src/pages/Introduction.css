@@ -130,6 +130,12 @@
 
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
+  /* Секции на мобилках не фиксированной высоты */
+  .snap-section {
+    min-height: 100vh;
+    height: auto;
+  }
+
   .text-7xl {
     font-size: 2.5rem;
     line-height: 1.2;
@@ -143,28 +149,55 @@
     font-size: 0.9rem;
   }
 
+  /* Адаптация заголовков */
+  .snap-section h1 {
+    font-size: 2.25rem !important;
+    line-height: 1.2;
+    margin-bottom: 1rem !important;
+  }
+
+  .snap-section h2 {
+    font-size: 2rem !important;
+    line-height: 1.3;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Увеличиваем размеры текста на мобилках */
+  .snap-section p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
   .floating-photo img {
     max-width: 100%;
   }
 
-  /* Дополнительные отступы для мобильных устройств */
+  /* Унифицированные отступы для мобильных устройств */
   .snap-section {
     padding-left: 1rem;
     padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 
   .text-container {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    margin-bottom: 1rem !important;
   }
 
   /* Уменьшаем отступы между элементами на мобильных */
-  .snap-section h1 {
-    margin-bottom: 1.5rem !important;
+  .snap-section .text-container {
+    margin-bottom: 1rem !important;
   }
 
-  .snap-section .text-container {
-    margin-bottom: 1.5rem !important;
+  /* Адаптация второй секции на мобилках */
+  .snap-section .grid {
+    gap: 1.5rem !important;
+  }
+
+  .snap-section .space-y-4 {
+    gap: 0.75rem;
   }
 
   /* Убеждаемся, что кнопка видна на мобильных */
@@ -172,24 +205,65 @@
     position: relative;
     z-index: 30;
     min-width: 200px;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
   }
 
   /* Уменьшаем размер фото на мобильных */
   .floating-photo img {
     max-width: 280px;
   }
+
+  /* Фото на первой секции */
+  .snap-section img[alt="Космическое фото"] {
+    width: 250px !important;
+    max-width: 90% !important;
+  }
   
   /* Адаптация летающих фото на первом слайде для мобильных */
   .floating-photo-3 {
-    width: 180px !important;
-    left: 15%;
-    bottom: 3%;
+    width: 150px !important;
+    left: 10%;
+    bottom: 2%;
   }
   
   .floating-photo-4 {
+    width: 170px !important;
+    right: 10%;
+    bottom: 2%;
+  }
+
+  /* Улучшаем отступы для контента */
+  .snap-section .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Адаптация текста поздравления */
+  .snap-section .text-5xl {
+    font-size: 1.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Уменьшаем отступы в третьей секции */
+  .snap-section .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+
+  .snap-section .mb-6 {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Адаптация фото на второй секции */
+  .snap-section .photo-no-glow {
+    max-width: 250px !important;
+    width: 100% !important;
+  }
+
+  /* Адаптация фото на третьей секции */
+  .snap-section .w-52 {
     width: 200px !important;
-    right: 15%;
-    bottom: 3%;
+    max-width: 90% !important;
   }
 }
 
