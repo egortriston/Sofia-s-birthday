@@ -19,6 +19,20 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE и Edge */
+  /* Улучшенная плавность скролла */
+  overscroll-behavior: smooth;
+  overscroll-behavior-y: smooth;
+  /* Оптимизация производительности */
+  will-change: scroll-position;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Мягкое замедление */
+  scroll-snap-stop: always;
+  /* Дополнительные оптимизации для плавности */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Плавное замедление инерции скролла */
+  scroll-margin: 0;
 }
 
 /* На мобильных отключаем snap-скролл */
@@ -40,6 +54,15 @@
 /* Плавная прокрутка для всех браузеров */
 .snap-container {
   scroll-behavior: smooth;
+  /* Дополнительные оптимизации для плавности */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  /* Мягкая инерция скролла */
+  scroll-snap-stop: always;
+  /* Оптимизация рендеринга */
+  contain: layout style paint;
 }
 
 /* Улучшенная плавность для WebKit */
@@ -49,11 +72,28 @@
   }
 }
 
+/* Плавная прокрутка с кастомным easing */
+@supports (scroll-behavior: smooth) {
+  .snap-container {
+    scroll-behavior: smooth;
+  }
+}
+
 /* Улучшенные переходы для секций */
 .snap-section {
   scroll-snap-align: start;
-  scroll-snap-stop: normal;
-  will-change: scroll-position;
+  scroll-snap-stop: always;
+  will-change: transform, opacity;
+  /* Оптимизация для плавной анимации */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Плавный переход при скролле с более мягким easing */
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Оптимизация рендеринга */
+  contain: layout style paint;
 }
 
 /* Анимация летающего фото */

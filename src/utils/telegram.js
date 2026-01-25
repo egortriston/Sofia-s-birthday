@@ -68,5 +68,33 @@ export const sendCompletionMessage = async () => {
   }
 }
 
+export const sendAIMessage = async (message) => {
+  const telegramMessage = `💬 <b>Сообщение от AI ассистента:</b>\n\n${message}`
+  
+  try {
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID && TELEGRAM_CHAT_ID !== 'YOUR_CHAT_ID') {
+      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: telegramMessage,
+          parse_mode: 'HTML',
+        }),
+      })
+      
+      if (!response.ok) {
+        console.error('Ошибка отправки в Telegram:', await response.text())
+      }
+    } else {
+      console.log('Telegram не настроен. Сообщение:', telegramMessage)
+    }
+  } catch (error) {
+    console.error('Ошибка отправки в Telegram:', error)
+  }
+}
+
 
 

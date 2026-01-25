@@ -31,11 +31,11 @@ const cardImages = [
   image211, image212, image213, image214, image215, image216, image217, image218, image219, image220, image221
 ]
 
-export function QuizCard3D({ 
-  question, 
-  position, 
-  rotation, 
-  isAnswered, 
+export function QuizCard3D({
+  question,
+  position,
+  rotation,
+  isAnswered,
   difficultyColor,
   onCardClick,
   imageIndex = 0,
@@ -46,11 +46,11 @@ export function QuizCard3D({
   const meshRef = useRef()
   const [hovered, setHovered] = useState(false)
   const hasLoadedRef = useRef(false)
-  
+
   // Выбираем правильное изображение по индексу (imageIndex 0 = 2.1.jpg, imageIndex 1 = 2.2.jpg и т.д.)
   const selectedImage = cardImages[imageIndex] || cardImages[0]
   const texture = useTexture(selectedImage)
-  
+
   // Уведомляем о загрузке текстуры (только один раз)
   useEffect(() => {
     if (texture && onLoad && !hasLoadedRef.current) {
@@ -61,7 +61,7 @@ export function QuizCard3D({
       })
     }
   }, [texture, onLoad])
-  
+
   // Настройка текстуры
   if (texture) {
     texture.wrapS = THREE.ClampToEdgeWrapping
@@ -96,22 +96,22 @@ export function QuizCard3D({
               justifyContent: 'center',
             }}
           >
-            {/* Яркое размытое свечение цвета карточки по уровню сложности на всю фотку */}
+            {/* Мягкое размытое свечение цвета карточки по уровню сложности на всю фотку */}
             <div
               style={{
                 position: 'absolute',
-                width: '120%',
-                height: '120%',
-                background: `radial-gradient(circle, ${color}FF 0%, ${color}DD 5%, ${color}BB 15%, ${color}99 25%, ${color}77 40%, ${color}55 55%, ${color}44 70%, ${color}33 85%, transparent 100%)`,
-                filter: 'blur(80px)',
+                width: '110%',
+                height: '110%',
+                background: `radial-gradient(circle, ${color}AA 0%, ${color}99 8%, ${color}88 18%, ${color}77 30%, ${color}66 45%, ${color}55 60%, ${color}44 75%, transparent 90%)`,
+                filter: 'blur(100px)',
                 borderRadius: '50%',
-                opacity: 0.9,
+                opacity: 0.6,
               }}
             />
           </div>
         </Html>
       )}
-      
+
       {/* Легкое серое свечение СЗАДИ для отвеченных карточек */}
       {isAnswered && (
         <Html
@@ -173,18 +173,18 @@ export function QuizCard3D({
         scale={hovered && !isAnswered ? 1.06 : 1}
       >
         <planeGeometry args={[CARD_IMAGE_SIZE, CARD_IMAGE_SIZE]} />
-        <meshBasicMaterial 
+        <meshBasicMaterial
           map={texture}
-          transparent 
+          transparent
           opacity={isAnswered ? 0.5 : 1}
           side={THREE.DoubleSide}
         />
-      
+
         {/* Overlay с номером в углу - показываем для всех карточек */}
         <Html
           transform
-          distanceFactor={0.3}
-          position={[-CARD_IMAGE_SIZE/2 + 0.1, CARD_IMAGE_SIZE/2 - 0.1, 0.01]}
+          distanceFactor={0.2}
+          position={[-CARD_IMAGE_SIZE / 2 + 0.1, CARD_IMAGE_SIZE / 2 - 0.1, 0.01]}
           pointerEvents="none"
         >
           <div
@@ -199,8 +199,8 @@ export function QuizCard3D({
               fontSize: '14px',
               fontWeight: 'bold',
               color: 'white',
-              boxShadow: isAnswered 
-                ? '0 0 5px rgba(156, 163, 175, 0.4)' 
+              boxShadow: isAnswered
+                ? '0 0 5px rgba(156, 163, 175, 0.4)'
                 : `0 0 8px ${color}80, 0 0 12px ${color}40`,
               border: '2px solid rgba(255, 255, 255, 0.3)',
             }}
@@ -210,6 +210,7 @@ export function QuizCard3D({
         </Html>
 
       </mesh>
+
     </group>
   )
 }

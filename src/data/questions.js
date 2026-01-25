@@ -165,8 +165,8 @@ export const questions = [
     difficulty: 'hard',
     question: 'С кем тебя сравнил в диссе на тебя',
     answer: 'Меган Мурковски',
-    prize: 'EP birthday',
-    prizeDescription: 'Маленький EP “birthday” - музыка, которая связана именно с тобой и этим днём.'
+    prize: 'Секретный музыкальный подарок',
+    prizeDescription: 'Маленький будущий секретик'
   },
   {
     id: 19,

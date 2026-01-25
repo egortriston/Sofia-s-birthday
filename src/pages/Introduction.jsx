@@ -83,13 +83,48 @@ function Introduction() {
 
     const container = containerRef.current
     if (container && !isLoading) {
-      container.addEventListener('scroll', handleScroll)
+      container.addEventListener('scroll', handleScroll, { passive: true })
       handleScroll() // Проверяем при загрузке
     }
 
     return () => {
       if (container) {
         container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [isLoading])
+
+  // Улучшенная плавность скролла с помощью wheel event
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || isLoading) return
+
+    let ticking = false
+    let lastScrollTime = 0
+
+    const handleWheel = (e) => {
+      const now = Date.now()
+      
+      // Ограничиваем частоту обработки для плавности
+      if (now - lastScrollTime < 16) {
+        return
+      }
+      lastScrollTime = now
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    // Добавляем обработчик wheel с passive для лучшей производительности
+    container.addEventListener('wheel', handleWheel, { passive: true })
+
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', handleWheel)
       }
     }
   }, [isLoading])

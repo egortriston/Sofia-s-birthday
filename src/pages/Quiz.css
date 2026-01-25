@@ -376,16 +376,32 @@
   }
 }
 
+.question-modal-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  max-width: 1200px;
+  width: 95%;
+  max-height: 90vh;
+}
+
+.question-modal-assistant {
+  flex: 0 0 320px;
+  min-width: 320px;
+}
+
 .question-modal {
+  flex: 1;
   background: rgba(0, 0, 0, 0.95);
   border: 3px solid;
   border-radius: 20px;
   max-width: 600px;
-  width: 90%;
   max-height: 90vh;
   overflow: hidden;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(102, 126, 234, 0.2);
   animation: slideUp 0.3s ease;
+  z-index: 10000000000000000000000000000000000000000;
+  position: relative;
 }
 
 @keyframes slideUp {
@@ -414,23 +430,41 @@
 }
 
 .question-modal-close {
-  background: transparent;
-  border: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   color: white;
-  font-size: 2rem;
+  font-size: 0;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.3s ease;
+  z-index: 10001;
+  padding: 0;
+  margin: 0;
+  backdrop-filter: blur(10px);
+}
+
+.question-modal-close::before {
+  content: '×';
+  font-size: 2.5rem;
+  line-height: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-weight: 300;
+  font-family: Arial, sans-serif;
 }
 
 .question-modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .question-modal-content {
@@ -649,6 +683,211 @@
   .question-input {
     font-size: 1rem;
     padding: 12px;
+  }
+
+  .question-modal-container {
+    flex-direction: column;
+    width: 95%;
+  }
+
+  .question-modal-assistant {
+    flex: 0 0 auto;
+    min-width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+/* AI Ассистент - упрощенный дизайн */
+.ai-assistant-simple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.ai-avatar-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-avatar-simple {
+  width: 600px;
+  height: 600px;
+  object-fit: contain;
+  image-rendering: crisp-edges;
+  transition: transform 0.1s ease;
+}
+
+.ai-avatar-simple.shake {
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-2px, -1px) rotate(-0.5deg); }
+  20% { transform: translate(2px, 1px) rotate(0.5deg); }
+  30% { transform: translate(-1px, 2px) rotate(-0.3deg); }
+  40% { transform: translate(1px, -2px) rotate(0.3deg); }
+  50% { transform: translate(-2px, 1px) rotate(-0.2deg); }
+  60% { transform: translate(2px, -1px) rotate(0.2deg); }
+  70% { transform: translate(-1px, -1px) rotate(-0.1deg); }
+  80% { transform: translate(1px, 1px) rotate(0.1deg); }
+  90% { transform: translate(-1px, 0) rotate(0deg); }
+}
+
+/* Облачко с сообщением как в комиксах */
+.ai-speech-bubble {
+  position: absolute;
+  top: 400px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 20px;
+  padding: 18px 24px;
+  min-width: 300px;
+  max-width: 300px;
+  max-height: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: bubbleAppear 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE и Edge */
+}
+
+.ai-speech-bubble::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.ai-speech-bubble-content {
+  color: #333;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  position: relative;
+  z-index: 2;
+}
+
+.ai-speech-bubble-tail {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid white;
+  z-index: 1;
+}
+
+/* Кнопка подсказки */
+.ai-hint-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+  margin-top: 15px;
+  z-index: 10;
+  position: relative;
+}
+
+.ai-hint-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ai-hint-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes bubbleAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .question-modal-overlay {
+    align-items: flex-start;
+    padding: 20px 10px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .question-modal-container {
+    flex-direction: column;
+    align-items: center;
+    max-height: none;
+    width: 100%;
+    padding-bottom: 20px;
+  }
+
+  .question-modal-assistant {
+    flex: 0 0 auto;
+    min-width: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ai-avatar-simple {
+    width: 300px;
+    height: 300px;
+  }
+
+  .ai-avatar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ai-speech-bubble {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    min-width: 280px;
+    max-width: 100%;
+    padding: 15px 20px;
+    max-height: 250px;
+    margin-top: 20px;
+    order: 2;
+  }
+
+  .ai-speech-bubble-tail {
+    display: none;
+  }
+
+  .ai-speech-bubble-content {
+    font-size: 0.95rem;
+  }
+
+  .question-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+  }
+
+  .question-modal-close {
+    top: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.8rem;
   }
 }
 

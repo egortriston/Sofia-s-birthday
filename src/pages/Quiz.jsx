@@ -7,6 +7,8 @@ import { QuizCards3D } from "@/components/ui/QuizCards3D"
 import { ElectricCard } from "@/components/ui/electric-card"
 import ElectricBorder from "@/components/ui/ElectricBorder"
 import { SolarLoader } from "@/components/ui/solar-loader"
+import { AIAssistant } from "@/components/ui/AIAssistant"
+import { checkAnswerWithAI } from '../utils/deepseek'
 import { questions, hints } from '../data/questions'
 import { sendToTelegram, sendCompletionMessage } from '../utils/telegram'
 import './Quiz.css'
@@ -14,21 +16,21 @@ import './Quiz.css'
 function Quiz() {
   const navigate = useNavigate()
   const [selectedCard, setSelectedCard] = useState(null)
-  
+
   // Загружаем прогресс из localStorage при инициализации
   const loadProgress = () => {
     try {
       const savedAnswered = localStorage.getItem('quiz-progress-answered')
       const savedAnswers = localStorage.getItem('quiz-progress-answers')
-      
-      const answeredSet = savedAnswered 
+
+      const answeredSet = savedAnswered
         ? new Set(JSON.parse(savedAnswered).map(Number))
         : new Set()
-      
-      const answersObj = savedAnswers 
+
+      const answersObj = savedAnswers
         ? JSON.parse(savedAnswers)
         : {}
-      
+
       return { answeredSet, answersObj }
     } catch (error) {
       console.error('Ошибка при загрузке прогресса:', error)
@@ -107,7 +109,7 @@ function Quiz() {
 
   const handleAnswerSubmit = async (cardId, userAnswer) => {
     const question = questions.find(q => q.id === cardId)
-    if (!question) return
+    if (!question) return false
 
     // Нормализация букв: ё = е
     const normalizeLetter = (char) => {
@@ -151,12 +153,45 @@ function Quiz() {
       }
       userAnswerText = userAnswer?.userText || ''
     } else {
-      const normalizedUserAnswer = normalize(userAnswer || '')
-      const normalizedCorrectAnswer = normalize(question.answer)
-      // Специальная обработка для вопросов с "*любой ответ верен*"
-      isCorrect = question.answer.includes('*любой ответ верен*') 
-        ? (userAnswer || '').trim().length > 0  // Любой непустой ответ считается правильным
-        : normalizedUserAnswer === normalizedCorrectAnswer
+      // Проверяем ответ через AI
+      userAnswerText = userAnswer || ''
+      try {
+        const aiResult = await checkAnswerWithAI(question.question, userAnswerText, question.answer)
+        isCorrect = aiResult.isCorrect
+
+        // Дополнительная локальная проверка для предотвращения принятия сокращений
+        // Если AI принял ответ, но локальная проверка показывает, что это сокращение - отклоняем
+        if (isCorrect) {
+          const normalizedUserAnswer = normalize(userAnswerText)
+          const normalizedCorrectAnswer = normalize(question.answer)
+
+          // Если ответы не совпадают точно
+          if (normalizedUserAnswer !== normalizedCorrectAnswer) {
+            // Проверяем, является ли ответ началом правильного ответа (сокращение)
+            const isAbbreviation = normalizedCorrectAnswer.startsWith(normalizedUserAnswer)
+            const lengthRatio = normalizedUserAnswer.length / normalizedCorrectAnswer.length
+
+            // Если это сокращение (ответ является началом правильного) и длина меньше 70% - отклоняем
+            if (isAbbreviation && lengthRatio < 0.7) {
+              console.log('⚠️ Отклонено как сокращение:', { userAnswer: normalizedUserAnswer, correctAnswer: normalizedCorrectAnswer, lengthRatio })
+              isCorrect = false
+            }
+            // Если ответ не является началом правильного и не совпадает - тоже отклоняем
+            else if (!isAbbreviation && normalizedUserAnswer.length < normalizedCorrectAnswer.length * 0.8) {
+              console.log('⚠️ Отклонено - неполное совпадение:', { userAnswer: normalizedUserAnswer, correctAnswer: normalizedCorrectAnswer })
+              isCorrect = false
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка проверки ответа через AI:', error)
+        // Fallback на локальную проверку при ошибке AI
+        const normalizedUserAnswer = normalize(userAnswerText)
+        const normalizedCorrectAnswer = normalize(question.answer)
+        isCorrect = question.answer.includes('*любой ответ верен*')
+          ? userAnswerText.trim().length > 0
+          : normalizedUserAnswer === normalizedCorrectAnswer
+      }
     }
 
     // Отправка в Telegram
@@ -165,18 +200,14 @@ function Quiz() {
     if (isCorrect) {
       setAnsweredCards(prev => new Set([...prev, cardId]))
       setUserAnswers(prev => ({ ...prev, [cardId]: userAnswer }))
-      setSelectedCard(null)
-      setShowPrize(true)
-      const description = question.prizeDescription 
-        ? `${question.prize} - ${question.prizeDescription}`
-        : `Твой приз: ${question.prize}`
-      setPrizeMessage(`Верно! ${description}`)
+      // Не показываем окно подарка - AI ассистент сам скажет
     } else {
-      const randomHint = hints[Math.floor(Math.random() * hints.length)]
-      setDipsyMessage(`Не совсем! Подсказка: ${randomHint}`)
-      setShowDipsy(true)
-      setTimeout(() => setShowDipsy(false), 4000)
+      // Неправильный ответ - показываем только через AI ассистента
+      // Убрали автоматическое окно dipsy
     }
+
+    // Возвращаем результат для использования в QuestionModalWithState
+    return isCorrect
   }
 
   const progress = answeredCards.size
@@ -210,7 +241,7 @@ function Quiz() {
   return (
     <div className="quiz-page relative w-full h-screen bg-black">
       {/* 3D Scene with Cards - рендерим всегда, чтобы карточки загружались */}
-      <Canvas 
+      <Canvas
         camera={{ position: [-12, 1.5, 12], fov: 50 }}
         onCreated={() => {
           // Canvas готов, даем время на инициализацию
@@ -231,11 +262,11 @@ function Quiz() {
             onAllCardsLoaded={handleAllCardsLoaded}
           />
         </Suspense>
-        <OrbitControls 
-          enablePan={true} 
-          enableZoom={true} 
+        <OrbitControls
+          enablePan={true}
+          enableZoom={true}
           enableRotate={true}
-         
+
           makeDefault
         />
       </Canvas>
@@ -255,13 +286,14 @@ function Quiz() {
         </div>
 
         {/* Модальное окно с вопросом */}
-        {selectedCard && !answeredCards.has(selectedCard) && (
-          <QuestionModal
+        {selectedCard && (
+          <QuestionModalWithState
             question={questions.find(q => q.id === selectedCard)}
             onSubmit={(answer) => handleAnswerSubmit(selectedCard, answer)}
             onClose={() => setSelectedCard(null)}
             difficultyColor={getDifficultyColor(questions.find(q => q.id === selectedCard)?.difficulty)}
             difficultyLabel={getDifficultyLabel(questions.find(q => q.id === selectedCard)?.difficulty)}
+            isAnswered={answeredCards.has(selectedCard)}
           />
         )}
 
@@ -273,7 +305,7 @@ function Quiz() {
         )}
 
         {showPrize && (
-          <div 
+          <div
             className="prize-overlay pointer-events-auto"
             onClick={() => setShowPrize(false)}
           >
@@ -285,7 +317,7 @@ function Quiz() {
         )}
 
         {allAnswered && (
-          <button 
+          <button
             className="final-button pointer-events-auto"
             onClick={() => navigate('/finale')}
           >
@@ -298,9 +330,40 @@ function Quiz() {
 }
 
 function CrosswordPuzzle({ solution, onSubmit, onClose, accentColor }) {
-  const [grid, setGrid] = useState(
-    () => (solution || []).map(row => row.map(cell => (cell === null ? null : '')))
-  )
+  const [grid, setGrid] = useState(() => {
+    if (!solution || solution.length === 0) {
+      return []
+    }
+
+    // Создаем массив всех активных клеток (не null)
+    const activeCells = []
+    solution.forEach((row, ri) => {
+      row.forEach((cell, ci) => {
+        if (cell !== null) {
+          activeCells.push({ row: ri, col: ci, value: cell })
+        }
+      })
+    })
+
+    // Перемешиваем массив случайным образом
+    const shuffled = [...activeCells].sort(() => Math.random() - 0.5)
+
+    // Берем половину клеток для предзаполнения
+    const cellsToFill = Math.floor(activeCells.length / 2)
+    const filledCells = new Set()
+    shuffled.slice(0, cellsToFill).forEach(cell => {
+      filledCells.add(`${cell.row}-${cell.col}`)
+    })
+
+    // Создаем grid с предзаполненными клетками
+    return solution.map((row, ri) =>
+      row.map((cell, ci) => {
+        if (cell === null) return null
+        const key = `${ri}-${ci}`
+        return filledCells.has(key) ? cell : ''
+      })
+    )
+  })
   const [error, setError] = useState('')
   const [mismatches, setMismatches] = useState(null)
 
@@ -410,7 +473,108 @@ function CrosswordPuzzle({ solution, onSubmit, onClose, accentColor }) {
   )
 }
 
-function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficultyLabel }) {
+// Компонент-обертка для управления состоянием ответа
+function QuestionModalWithState({ question, onSubmit, onClose, difficultyColor, difficultyLabel }) {
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState(null)
+  const [prize, setPrize] = useState(null)
+  const [prizeDescription, setPrizeDescription] = useState(null)
+  const [submittedAnswer, setSubmittedAnswer] = useState(null)
+
+  // Сбрасываем состояние при изменении вопроса
+  useEffect(() => {
+    setIsAnswerCorrect(null)
+    setPrize(null)
+    setPrizeDescription(null)
+    setSubmittedAnswer(null)
+  }, [question?.id])
+
+  const handleSubmit = async (answer) => {
+    // Сохраняем ответ перед отправкой
+    setSubmittedAnswer(answer)
+    console.log('📝 Сохранен ответ для AI:', answer)
+
+    if (question.type === 'crossword') {
+      // Для кроссворда проверка будет в handleAnswerSubmit
+      setIsAnswerCorrect(null) // Сбрасываем для показа загрузки
+      // Вызываем onSubmit и получаем результат проверки
+      // handleAnswerSubmit - async функция, возвращает промис
+      try {
+        const result = onSubmit(answer)
+        // Обрабатываем результат (может быть промис или синхронное значение)
+        if (result && typeof result.then === 'function') {
+          result.then(isCorrect => {
+            if (isCorrect) {
+              setIsAnswerCorrect(true)
+              setPrize(question.prize)
+              setPrizeDescription(question.prizeDescription)
+            } else {
+              setIsAnswerCorrect(false)
+            }
+          }).catch(error => {
+            console.error('❌ Ошибка проверки кроссворда:', error)
+            setIsAnswerCorrect(false)
+          })
+        } else {
+          // Синхронный результат (не должен быть, но на всякий случай)
+          if (result) {
+            setIsAnswerCorrect(true)
+            setPrize(question.prize)
+            setPrizeDescription(question.prizeDescription)
+          } else {
+            setIsAnswerCorrect(false)
+          }
+        }
+      } catch (error) {
+        console.error('❌ Ошибка при вызове onSubmit для кроссворда:', error)
+        setIsAnswerCorrect(false)
+      }
+    } else {
+      // Проверяем ответ через AI
+      // Сразу устанавливаем null чтобы AI ассистент перешел в состояние THINKING
+      setIsAnswerCorrect(null) // Сбрасываем для показа загрузки
+      console.log('📝 Проверка ответа через AI:', {
+        question: question.question,
+        userAnswer: answer,
+        correctAnswer: question.answer,
+        answerType: typeof answer,
+        answerLength: answer?.length
+      })
+      try {
+        const result = await checkAnswerWithAI(question.question, answer, question.answer)
+        console.log('✅ Результат проверки AI:', result)
+
+        if (result.isCorrect) {
+          setIsAnswerCorrect(true)
+          setPrize(question.prize)
+          setPrizeDescription(question.prizeDescription)
+        } else {
+          setIsAnswerCorrect(false)
+        }
+        onSubmit(answer)
+      } catch (error) {
+        console.error('❌ Ошибка проверки ответа:', error)
+        setIsAnswerCorrect(false)
+        onSubmit(answer)
+      }
+    }
+  }
+
+  return (
+    <QuestionModal
+      question={question}
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      difficultyColor={difficultyColor}
+      difficultyLabel={difficultyLabel}
+      isAnswerCorrect={isAnswerCorrect}
+      prize={prize}
+      prizeDescription={prizeDescription}
+      submittedAnswer={submittedAnswer}
+    />
+  )
+}
+
+function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficultyLabel, isAnswerCorrect, prize, prizeDescription, submittedAnswer }) {
   const [answer, setAnswer] = useState('')
   const isCrossword = question?.type === 'crossword'
 
@@ -426,63 +590,92 @@ function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficult
 
   return (
     <div className="question-modal-overlay pointer-events-auto" onClick={onClose}>
-      <div 
-        className="question-modal" 
+      {/* Крестик для закрытия в левом верхнем углу экрана - показывается только после правильного ответа */}
+      {isAnswerCorrect === true && (
+        <button
+          className="question-modal-close"
+          onClick={onClose}
+          aria-label="Закрыть"
+        />
+      )}
+      <div
+        className="question-modal-container"
         onClick={(e) => e.stopPropagation()}
       >
-        <ElectricBorder
-          color={difficultyColor}
-          speed={1}
-          chaos={0.6}
-          thickness={2}
-          style={{ borderRadius: 20 }}
-        >
-          <ElectricCard
-            variant={question.difficulty === 'hard' ? 'hue' : 'swirl'}
-            color={difficultyColor}
-            badge={difficultyLabel}
-            title={`Вопрос #${question.id}`}
-            description={question.question}
-          >
-          <div className="question-content-scroll">
-            {isCrossword ? (
-              <CrosswordPuzzle
-                solution={question.crosswordSolution}
-                onSubmit={onSubmit}
-                onClose={onClose}
-                accentColor={difficultyColor}
-              />
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  className="question-input"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  placeholder="Введите ваш ответ..."
-                  autoFocus
-                />
-                <div className="question-modal-buttons">
-                  <button
-                    type="submit"
-                    className="question-submit-btn"
-                    style={{ backgroundColor: difficultyColor }}
-                  >
-                    Ответить
-                  </button>
-                  <button
-                    type="button"
-                    className="question-cancel-btn"
-                    onClick={onClose}
-                  >
-                    Отмена
-                  </button>
+        {/* AI Ассистент слева */}
+        <div className="question-modal-assistant">
+          <AIAssistant
+            question={question.question}
+            correctAnswer={question.answer}
+            userAnswer={isCrossword && submittedAnswer && typeof submittedAnswer === 'object'
+              ? submittedAnswer.userText || ''
+              : submittedAnswer || ''}
+            isAnswerCorrect={isAnswerCorrect}
+            prize={prize}
+            prizeDescription={prizeDescription}
+            onClose={onClose}
+            isCrossword={isCrossword}
+          />
+        </div>
+
+        {/* Основное модальное окно с вопросом - скрывается при правильном ответе */}
+        {isAnswerCorrect !== true && (
+          <div className="question-modal">
+            <ElectricBorder
+              color={difficultyColor}
+              speed={1}
+              chaos={0.6}
+              thickness={2}
+              style={{ borderRadius: 20 }}
+            >
+              <ElectricCard
+                variant={question.difficulty === 'hard' ? 'hue' : 'swirl'}
+                color={difficultyColor}
+                badge={difficultyLabel}
+                title={`Вопрос #${question.id}`}
+                description={question.question}
+              >
+                <div className="question-content-scroll">
+                  {isCrossword ? (
+                    <CrosswordPuzzle
+                      solution={question.crosswordSolution}
+                      onSubmit={onSubmit}
+                      onClose={onClose}
+                      accentColor={difficultyColor}
+                    />
+                  ) : (
+                    <form onSubmit={handleSubmit}>
+                      <input
+                        type="text"
+                        className="question-input"
+                        value={answer}
+                        onChange={(e) => setAnswer(e.target.value)}
+                        placeholder="Введите ваш ответ..."
+                        autoFocus
+                      />
+                      <div className="question-modal-buttons">
+                        <button
+                          type="submit"
+                          className="question-submit-btn"
+                          style={{ backgroundColor: difficultyColor }}
+                        >
+                          Ответить
+                        </button>
+                        <button
+                          type="button"
+                          className="question-cancel-btn"
+                          onClick={onClose}
+                        >
+                          Отмена
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
-              </form>
-            )}
+              </ElectricCard>
+            </ElectricBorder>
           </div>
-          </ElectricCard>
-        </ElectricBorder>
+        )}
       </div>
     </div>
   )

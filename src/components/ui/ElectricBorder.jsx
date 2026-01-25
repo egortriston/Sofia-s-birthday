@@ -67,7 +67,7 @@ const ElectricBorder = ({
 
     const baseDur = 6
     const dur = Math.max(0.001, baseDur / (speed || 1))
-    ;[...dyAnims, ...dxAnims].forEach((a) => a.setAttribute('dur', `${dur}s`))
+      ;[...dyAnims, ...dxAnims].forEach((a) => a.setAttribute('dur', `${dur}s`))
 
     const disp = svg.querySelector('feDisplacementMap')
     if (disp) disp.setAttribute('scale', String(30 * (chaos || 1)))
@@ -267,7 +267,7 @@ const ElectricBorder = ({
         <div className="absolute inset-0" style={bgGlowStyle} />
       </div>
 
-      <div className="relative z-[1]" style={inheritRadius}>
+      <div className="relative z-[1] w-full overflow-hidden" style={inheritRadius}>
         {children}
       </div>
     </div>
