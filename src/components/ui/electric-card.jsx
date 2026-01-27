@@ -34,7 +34,7 @@ export function ElectricCard({
       />
 
       {/* Основная карточка */}
-      <div className="relative overflow-hidden rounded-3xl border-none bg-gradient-to-b from-black/80 via-black to-black px-6 py-6 md:px-8 md:py-7 shadow-[0_24px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl">
+      <div className="relative overflow-hidden rounded-3xl border-none bg-gradient-to-b from-black/80 via-black to-black px-6 py-6 md:px-8 md:py-7 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
         <div className="mb-4 flex items-center justify-between gap-3">
           {badge && (
             <span className="inline-flex items-center rounded-full   bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white/70">

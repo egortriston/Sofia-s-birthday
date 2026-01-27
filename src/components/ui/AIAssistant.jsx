@@ -286,15 +286,24 @@ export function AIAssistant({
         )}
       </div>
       
-      {!isCrossword && state !== STATES.WIN && (displayedMessage || fullMessage || isLoading || state === STATES.THINKING) && (
+      {/* Кнопка всегда видна (кроме кроссворда и win).
+          В пассиве показывает "Слушаю" и не активна. */}
+      {!isCrossword && state !== STATES.WIN && (() => {
+        const isThinking = isLoading || state === STATES.THINKING
+        const isIdle = !isThinking && state === STATES.START && !displayedMessage && !fullMessage
+        const label = isThinking ? 'Думаю...' : isIdle ? 'Слушаю' : 'Подсказка'
+        const disabled = isThinking || isIdle
+
+        return (
         <button
           className="ai-hint-button"
           onClick={handleGetHint}
-          disabled={isLoading || state === STATES.THINKING}
+          disabled={disabled}
         >
-          {isLoading || state === STATES.THINKING ? 'Думаю...' : 'Подсказка'}
+          {label}
         </button>
-      )}
+        )
+      })()}
     </div>
   )
 }

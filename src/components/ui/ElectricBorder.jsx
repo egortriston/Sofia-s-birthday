@@ -151,7 +151,7 @@ const ElectricBorder = ({
   return (
     <div
       ref={rootRef}
-      className={'relative isolate ' + (className ?? '')}
+      className={'relative isolate overflow-hidden ' + (className ?? '')}
       style={style}
     >
       <svg

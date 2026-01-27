@@ -1,4 +1,5 @@
 import { useState, Suspense, useMemo, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
@@ -281,12 +282,12 @@ function Quiz() {
         <div className="quiz-header pointer-events-none">
           <h2>Исследование космоса</h2>
           <div className="progress-counter">
-            Исследовано: {progress}/21
+            Пройдено: {progress}/21
           </div>
         </div>
 
-        {/* Модальное окно с вопросом */}
-        {selectedCard && (
+        {/* Модальное окно с вопросом — рендер в body поверх портала drei Html (z-index до 16777271), иначе свечение карточек перекрывает оверлей */}
+        {selectedCard && createPortal(
           <QuestionModalWithState
             question={questions.find(q => q.id === selectedCard)}
             onSubmit={(answer) => handleAnswerSubmit(selectedCard, answer)}
@@ -294,7 +295,8 @@ function Quiz() {
             difficultyColor={getDifficultyColor(questions.find(q => q.id === selectedCard)?.difficulty)}
             difficultyLabel={getDifficultyLabel(questions.find(q => q.id === selectedCard)?.difficulty)}
             isAnswered={answeredCards.has(selectedCard)}
-          />
+          />,
+          document.body
         )}
 
         {showDipsy && (
@@ -598,12 +600,9 @@ function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficult
           aria-label="Закрыть"
         />
       )}
-      <div
-        className="question-modal-container"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* AI Ассистент слева */}
-        <div className="question-modal-assistant">
+      <div className="question-modal-container">
+        {/* AI Ассистент слева — клик по нему не закрывает модалку */}
+        <div className="question-modal-assistant" onClick={(e) => e.stopPropagation()}>
           <AIAssistant
             question={question.question}
             correctAnswer={question.answer}
@@ -618,9 +617,9 @@ function QuestionModal({ question, onSubmit, onClose, difficultyColor, difficult
           />
         </div>
 
-        {/* Основное модальное окно с вопросом - скрывается при правильном ответе */}
+        {/* Основное модальное окно с вопросом — скрывается при правильном ответе; клик по нему не закрывает модалку */}
         {isAnswerCorrect !== true && (
-          <div className="question-modal">
+          <div className="question-modal" onClick={(e) => e.stopPropagation()}>
             <ElectricBorder
               color={difficultyColor}
               speed={1}

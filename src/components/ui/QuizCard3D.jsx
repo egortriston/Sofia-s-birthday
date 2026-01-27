@@ -73,13 +73,14 @@ export function QuizCard3D({
 
   return (
     <group position={position} rotation={rotation}>
-      {/* Очень яркое свечение СЗАДИ карточки на всю фотку */}
+      {/* Очень яркое свечение СЗАДИ карточки на всю фотку; occlude — чтобы свечение не проходило через другие карточки */}
       {!isAnswered && (
         <Html
           transform
           distanceFactor={0.6}
           position={[0, 0, -0.03]}
           pointerEvents="none"
+          occlude
           style={{
             width: `${CARD_IMAGE_SIZE * 600}px`,
             height: `${CARD_IMAGE_SIZE * 600}px`,
@@ -105,20 +106,21 @@ export function QuizCard3D({
                 background: `radial-gradient(circle, ${color}AA 0%, ${color}99 8%, ${color}88 18%, ${color}77 30%, ${color}66 45%, ${color}55 60%, ${color}44 75%, transparent 90%)`,
                 filter: 'blur(100px)',
                 borderRadius: '50%',
-                opacity: 0.6,
+                opacity: 0.7,
               }}
             />
           </div>
         </Html>
       )}
 
-      {/* Легкое серое свечение СЗАДИ для отвеченных карточек */}
+      {/* Легкое серое свечение СЗАДИ для отвеченных карточек; occlude — чтобы свечение не проходило через другие карточки */}
       {isAnswered && (
         <Html
           transform
           distanceFactor={0.6}
           position={[0, 0, -0.03]}
           pointerEvents="none"
+          occlude
           style={{
             width: `${CARD_IMAGE_SIZE * 500}px`,
             height: `${CARD_IMAGE_SIZE * 500}px`,

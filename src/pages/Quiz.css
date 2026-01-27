@@ -358,12 +358,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
+  /* Чуть темнее, чтобы 3D-свечения не просвечивали */
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  /* Поверх любых 3D Html-порталов/свечений (максимум, который корректно держат браузеры) */
+  z-index: 2147483647;
   animation: fadeIn 0.3s ease;
 }
 
@@ -388,6 +390,8 @@
 .question-modal-assistant {
   flex: 0 0 320px;
   min-width: 320px;
+  position: relative;
+  z-index: 5;
 }
 
 .question-modal {
@@ -400,7 +404,6 @@
   overflow: hidden;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(102, 126, 234, 0.2);
   animation: slideUp 0.3s ease;
-  z-index: 10000000000000000000000000000000000000000;
   position: relative;
 }
 
