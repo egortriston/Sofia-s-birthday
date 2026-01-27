@@ -57,7 +57,7 @@
   text-align: justify;
   color: #ffd700;
   text-shadow: 0 0 15px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.6);
-  animation: crawl 150s linear;
+  animation: crawl 220s linear;
   
   animation-fill-mode: forwards;
   font-weight: 600;
@@ -126,7 +126,7 @@
   }
   
   .crawl-text p {
-    margin-bottom: 30px;
+    margin-bottom: 16px;
     letter-spacing: 0.5px;
     padding: 0;
     word-wrap: break-word;
@@ -135,7 +135,7 @@
   
   .crawl-text p:first-child {
     font-size: 1.5rem;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
     padding: 0;
   }
   
@@ -184,13 +184,13 @@
   }
   
   .crawl-text p {
-    margin-bottom: 25px;
+    margin-bottom: 12px;
     padding: 0;
   }
   
   .crawl-text p:first-child {
     font-size: 1.3rem;
-    margin-bottom: 35px;
+    margin-bottom: 18px;
   }
   
   @keyframes crawl {

@@ -11,7 +11,7 @@ import photo13 from '@/images/13.png'
 import { SolarLoader } from "@/components/ui/solar-loader"
 import './Introduction.css'
 
-function Introduction() { 
+function Introduction() {
   const navigate = useNavigate()
   const [showContent, setShowContent] = useState(false)
   const [showSecondSection, setShowSecondSection] = useState(false)
@@ -25,7 +25,7 @@ function Introduction() {
     // Загружаем все изображения
     const images = [photo1, photo2, photo13]
     let loadedCount = 0
-    
+
     const checkImageLoad = () => {
       loadedCount++
       if (loadedCount === images.length) {
@@ -104,7 +104,7 @@ function Introduction() {
 
     const handleWheel = (e) => {
       const now = Date.now()
-      
+
       // Ограничиваем частоту обработки для плавности
       if (now - lastScrollTime < 16) {
         return
@@ -179,7 +179,7 @@ function Introduction() {
             </h1>
             <div className="text-container max-w-3xl mx-auto mb-6 md:mb-10 px-4 md:px-0">
               <p className="greeting-text text-lg md:text-xl mb-4 md:mb-6 text-white/90">
-                Добро пожаловать в космическое путешествие, Софья! 
+                Добро пожаловать в космическое путешествие, Софья!
               </p>
               <p className="rules-text text-base md:text-lg mb-3 md:mb-4 text-white/80">
                 Ты знаешь, что для меня ты всегда была и есть самая главная звездочка! Поэтому я хотел бы подарить такое маленкькое приключение, где ты - это главная звезда)
@@ -216,25 +216,25 @@ function Introduction() {
       </div>
 
       {/* Вторая секция с анимированным фоном */}
-      <div 
+      <div
         ref={secondSectionRef}
         className="snap-section relative flex min-h-screen md:h-screen w-full overflow-hidden py-4 md:py-0"
       >
         <div className="absolute inset-0 z-0">
           <AnoAI />
         </div>
-        
+
         <div className="relative z-20 w-full h-full flex items-center justify-center pointer-events-auto">
           <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-60 items-center">
             {/* Левая половина - летающее фото */}
             <div className="flex items-center justify-center relative z-30">
-              <div 
+              <div
                 className={`floating-photo ${showSecondSection ? 'opacity-100 scale-100' : 'opacity-0 scale-90'} transition-all duration-1000 ease-out`}
                 style={{ visibility: showSecondSection ? 'visible' : 'visible' }}
               >
-                <img 
-                  src={photo1} 
-                  alt="Поздравление" 
+                <img
+                  src={photo1}
+                  alt="Поздравление"
                   className="photo-no-glow w-full max-w-md h-auto rounded-2xl shadow-2xl"
                   style={{ display: 'block' }}
                 />
@@ -242,7 +242,7 @@ function Introduction() {
             </div>
 
             {/* Правая половина - текст поздравления */}
-            <div 
+            <div
               className={`flex flex-col items-start justify-center text-white relative z-30 ${showSecondSection ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'} transition-all duration-1000 delay-300 ease-out`}
               style={{ visibility: showSecondSection ? 'visible' : 'visible' }}
             >
@@ -268,7 +268,7 @@ function Introduction() {
       </div>
 
       {/* Третья секция с кнопкой */}
-      <div 
+      <div
         ref={thirdSectionRef}
         className="snap-section relative flex min-h-screen md:h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-black via-purple-900/20 to-black py-4 md:py-0"
       >
@@ -287,23 +287,23 @@ function Introduction() {
                 </p>
                 <p className="text-white/90">
                   Перед тобой будет 21 карточка, каждая из которых скрывает интересный вопрос.
-                  Они поделены на 3 уровня сложностя. Зеленые - легкие, желтые - средние, а красные - как терпеть тебя на парах, сложно, что пиздец. Естественно, от уровня сложности зависит и крутизна подарка! Но советую, начать с самых легких, так будет интереснее, да и я старался сделать нарастающий эффект от призов) 
+                  Они поделены на 3 уровня сложностя. Зеленые - легкие, желтые - средние, а красные - как терпеть тебя на парах... Не буду ругаться матом, скажу, что сложно. Естественно, от уровня сложности зависит и крутизна подарка! Но советую, начать с самых легких, так будет интереснее, да и я старался сделать нарастающий эффект от призов)
                 </p>
                 <p className="text-white/90">
                   Не бойся ошибиться - если что-то пойдет не так, тебе помогу либо я, либо нейронка с подсказкой.
-                  Ну что? Вперед? 
+                  Вперед?
                 </p>
               </div>
             </div>
 
             {/* Правая половина - фото */}
             <div className="flex items-center justify-center -mt-8 md:mt-12">
-              <div 
+              <div
                 className={`floating-photo ${showThirdSection ? 'opacity-100 scale-100' : 'opacity-0 scale-90'} transition-all duration-1000 delay-300`}
               >
-                <img 
-                  src={photo2} 
-                  alt="Начать игру" 
+                <img
+                  src={photo2}
+                  alt="Начать игру"
                   className="w-52 md:w-[70%] max-w-md h-auto rounded-2xl shadow-2xl m-4"
                 />
               </div>
@@ -312,12 +312,12 @@ function Introduction() {
 
           {/* Кнопка внизу */}
           <div className={`w-full flex justify-center mt-0 md:mt-0 flex-shrink-0 mb-4 md:mb-0 ${showThirdSection ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-1000 delay-500`}>
-            <button 
+            <button
               className="pointer-events-auto z-30 relative px-8 md:px-16 py-4 md:py-6 text-lg md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 hover:scale-110 transform"
               onClick={handleStart}
               type="button"
             >
-              Начать путешествие 
+              Начать путешествие
             </button>
           </div>
         </div>
